@@ -105,13 +105,14 @@
   <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Your Home</div>
 </div>
 
-<script type="module">
-// ── PROPERTY DATA (loaded from propertyData.js via ES module) ──────────────
-// propertyData.js is copied here by webpack at build time — always in sync
-import { ALL_PROPERTIES } from './propertyData.js';
-const PROPERTIES = ALL_PROPERTIES.map(p => ({
+<script src="propertyData.js"></script>
+
+<script>
+// ── PROPERTY DATA ────────────────────────────────────────────────────────────
+// window.ALL_PROPERTIES is loaded from propertyData.js (injected by webpack)
+const PROPERTIES = (window.ALL_PROPERTIES || []).map(p => ({
   ...p,
-  zillow: p.zillowLink,  // map uses 'zillow', propertyData uses 'zillowLink'
+  zillow: p.zillowLink,
 }));
 
 const YOUR_HOME = { address:"8038 Springwater Dr W", city:"Indianapolis, IN 46256", lat:39.93890, lng:-85.96270 };
