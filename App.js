@@ -1,8 +1,7 @@
 import React, { useState, useMemo } from "react";
 import {
   Home, Bed, Bath, Square, Car, X, Calculator, ExternalLink,
-  Target, Sliders, Download, RefreshCw, CheckCircle, AlertTriangle,
-  HelpCircle, Clock,
+  Target, Sliders, Download,
 } from "lucide-react";
 import { ALL_PROPERTIES } from "./propertyData";
 
@@ -11,7 +10,6 @@ const HouseTrackerApp = () => {
   const [showScoringPreferences, setShowScoringPreferences] = useState(false);
   const [showFinancials, setShowFinancials] = useState(false);
   const [showSummaryTable, setShowSummaryTable] = useState(false);
-  const [showStatusChecker, setShowStatusChecker] = useState(false);
 
   const [financials, setFinancials] = useState(() => {
     const saved = localStorage.getItem("houseHuntFinancials");
@@ -142,266 +140,6 @@ const HouseTrackerApp = () => {
     sold:    houses.filter((h) => h.status === "Sold").length,
     total:   houses.length,
   }), [houses]);
-
-  // ── STATUS CHECKER ──────────────────────────────────────────────────────────
-
-  const StatusCheckerModal = () => {
-    const [results, setResults] = useState([]);
-    const [running, setRunning] = useState(false);
-    const [currentIndex, setCurrentIndex] = useState(-1);
-    const [done, setDone] = useState(false);
-
-    const checkAllStatuses = async () => {
-      setResults([]);
-      setRunning(true);
-      setDone(false);
-
-      for (let i = 0; i < houses.length; i++) {
-        const house = houses[i];
-        setCurrentIndex(i);
-
-        // Add card in "checking" state immediately
-        setResults((prev) => [...prev, {
-          id: house.id,
-          address: house.address,
-          recordedStatus: house.status,
-          recordedPrice: house.price,
-          detectedStatus: null,
-          currentPrice: null,
-          confidence: null,
-          reasoning: null,
-          state: "checking",
-        }]);
-
-        try {
-          // Calls Netlify serverless function — same domain, no CORS issue
-          const resp = await fetch("/.netlify/functions/check-status", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              house: {
-                id: house.id,
-                address: house.address,
-                city: house.city || "Fishers",
-                status: house.status,
-                price: house.price,
-                neighborhood: house.neighborhood,
-                url: house.zillowLink,
-              },
-            }),
-          });
-
-          const data = await resp.json();
-          if (!resp.ok) throw new Error(data.details || data.error || `HTTP ${resp.status}`);
-
-          const { detectedStatus, currentPrice, confidence, reasoning } = data;
-          const statusChanged = detectedStatus !== "Unknown" && detectedStatus !== house.status;
-          const priceChanged = currentPrice && currentPrice !== house.price;
-          const changed = statusChanged || priceChanged;
-
-          setResults((prev) => prev.map((r) => r.id === house.id
-            ? { ...r, detectedStatus, currentPrice, confidence, reasoning, state: changed ? "changed" : "confirmed" }
-            : r
-          ));
-        } catch (err) {
-          setResults((prev) => prev.map((r) => r.id === house.id
-            ? { ...r, detectedStatus: "Error", confidence: "Low", reasoning: err.message, state: "error" }
-            : r
-          ));
-        }
-
-        await new Promise((res) => setTimeout(res, 60000));
-      }
-
-      setCurrentIndex(-1);
-      setRunning(false);
-      setDone(true);
-    };
-
-    const getStateIcon = (state) => {
-      if (state === "checking")  return <Clock size={18} className="text-blue-500 animate-spin" />;
-      if (state === "confirmed") return <CheckCircle size={18} className="text-green-500" />;
-      if (state === "changed")   return <AlertTriangle size={18} className="text-amber-500" />;
-      return <HelpCircle size={18} className="text-red-400" />;
-    };
-
-    const getStateBg = (state) => {
-      if (state === "checking")  return "bg-blue-50 border-blue-200";
-      if (state === "confirmed") return "bg-green-50 border-green-200";
-      if (state === "changed")   return "bg-amber-50 border-amber-300";
-      return "bg-red-50 border-red-200";
-    };
-
-    const statusColor = (s) => {
-      if (s === "Active")  return "text-green-700 bg-green-100";
-      if (s === "Pending") return "text-red-700 bg-red-100";
-      if (s === "Sold")    return "text-gray-600 bg-gray-200";
-      return "text-gray-500 bg-gray-100";
-    };
-
-    const changed   = results.filter((r) => r.state === "changed");
-    const confirmed = results.filter((r) => r.state === "confirmed");
-    const errors    = results.filter((r) => r.state === "error");
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
-
-          <div className="p-5 border-b flex justify-between items-center bg-gradient-to-r from-indigo-600 to-blue-600 rounded-t-xl">
-            <div className="flex items-center gap-3 text-white">
-              <RefreshCw size={22} className={running ? "animate-spin" : ""} />
-              <div>
-                <h3 className="text-xl font-bold">Status Checker</h3>
-                <p className="text-blue-100 text-sm">Verifies each listing against live web data</p>
-              </div>
-            </div>
-            <button onClick={() => setShowStatusChecker(false)} className="text-white hover:text-blue-200">
-              <X size={24} />
-            </button>
-          </div>
-
-          {done && (
-            <div className="px-5 py-3 border-b bg-gray-50 flex gap-6 text-sm font-medium">
-              <span className="text-green-700">✓ {confirmed.length} confirmed</span>
-              <span className="text-amber-600">⚠ {changed.length} status changed</span>
-              {errors.length > 0 && <span className="text-red-500">✗ {errors.length} errors</span>}
-            </div>
-          )}
-
-          {!running && results.length === 0 && (
-            <div className="flex-1 flex flex-col items-center justify-center gap-4 p-10 text-center">
-              <div className="text-5xl">🔍</div>
-              <p className="text-gray-600 max-w-sm">
-                Checks all <strong>{houses.length} properties</strong> one by one using live web search to verify current listing status.
-              </p>
-              <p className="text-gray-400 text-sm">Takes about 16 minutes (1 minute per property to avoid rate limits)</p>
-              <button
-                onClick={checkAllStatuses}
-                className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg flex items-center gap-2"
-              >
-                <RefreshCw size={18} /> Start Validation
-              </button>
-            </div>
-          )}
-
-          {results.length > 0 && (
-            <div className="flex-1 overflow-y-auto p-4 space-y-2">
-              {running && (
-                <div className="mb-3">
-                  <div className="flex justify-between text-sm text-gray-500 mb-1">
-                    <span>Checking {currentIndex + 1} of {houses.length}…</span>
-                    <span>{Math.round(((currentIndex + 1) / houses.length) * 100)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-indigo-500 h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${((currentIndex + 1) / houses.length) * 100}%` }} />
-                  </div>
-                </div>
-              )}
-
-              {results.map((r) => (
-                <div key={r.id} className={`border rounded-lg p-3 flex gap-3 items-start ${getStateBg(r.state)}`}>
-                  <div className="mt-0.5 flex-shrink-0">{getStateIcon(r.state)}</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-gray-800 text-sm">{r.address}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor(r.recordedStatus)}`}>
-                        Was: {r.recordedStatus}
-                      </span>
-                      {r.detectedStatus && r.state !== "checking" && (
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${statusColor(r.detectedStatus)}`}>
-                          Now: {r.detectedStatus}
-                        </span>
-                      )}
-                      {r.confidence && r.state !== "checking" && (
-                        <span className="text-xs text-gray-400">({r.confidence} confidence)</span>
-                      )}
-                    </div>
-                    {r.state === "checking" && <p className="text-xs text-blue-400 mt-0.5">Searching…</p>}
-                    {r.state !== "checking" && r.currentPrice && (
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs text-gray-500">Price: <span className="font-medium text-gray-700">${r.recordedPrice?.toLocaleString()}</span> recorded</span>
-                        {r.currentPrice !== r.recordedPrice ? (
-                          <span className="text-xs font-bold text-amber-600">→ ${r.currentPrice?.toLocaleString()} now ⚠️</span>
-                        ) : (
-                          <span className="text-xs text-green-600">✓ price unchanged</span>
-                        )}
-                      </div>
-                    )}
-                    {r.reasoning && r.state !== "checking" && (
-                      <p className="text-xs text-gray-500 mt-1 leading-snug">
-                        {r.reasoning.startsWith("{") ? "API error — try again" : r.reasoning.slice(0, 120)}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {done && (
-            <div className={`p-4 border-t rounded-b-xl ${changed.length > 0 ? "bg-amber-50" : "bg-green-50"}`}>
-              {changed.length === 0 && errors.length === 0 ? (
-                <p className="text-sm text-green-700 font-medium">✅ All prices and statuses confirmed — your tracker is up to date!</p>
-              ) : (
-                <>
-                  <p className="text-sm text-amber-800 font-semibold mb-2">
-                    ⚠️ {changed.length} propert{changed.length === 1 ? "y needs" : "ies need"} updating in propertyData.js:
-                  </p>
-                  <ul className="mb-3 space-y-1">
-                    {changed.map((r) => (
-                      <li key={r.id} className="text-xs text-amber-700">
-                        • <strong>{r.address}</strong>
-                        {r.recordedStatus !== r.detectedStatus && r.detectedStatus !== "Unknown" && (
-                          <span>: status {r.recordedStatus} → <strong>{r.detectedStatus}</strong></span>
-                        )}
-                        {r.currentPrice && r.currentPrice !== r.recordedPrice && (
-                          <span className="ml-1">| price ${r.recordedPrice?.toLocaleString()} → <strong>${r.currentPrice?.toLocaleString()}</strong></span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="border-t border-amber-200 pt-3">
-                    <p className="text-xs text-amber-700 font-semibold mb-1">📋 Copy & paste into Claude to update propertyData.js:</p>
-                    <pre className="text-xs bg-white border border-amber-200 rounded p-2 whitespace-pre-wrap text-gray-700 font-mono max-h-40 overflow-y-auto">
-                      {changed.map(r => {
-                        const lines = [`Property: ${r.address} (${r.id})`];
-                        if (r.detectedStatus !== "Unknown" && r.detectedStatus !== r.recordedStatus) {
-                          lines.push(`  - Change status from "${r.recordedStatus}" to "${r.detectedStatus}"`);
-                        }
-                        if (r.currentPrice && r.currentPrice !== r.recordedPrice) {
-                          lines.push(`  - Change price from ${r.recordedPrice} to ${r.currentPrice}`);
-                        }
-                        return lines.join('\n');
-                      }).join('\n\n')}
-                    </pre>
-                    <button
-                      onClick={() => {
-                        const text = changed.map(r => {
-                          const lines = [`Property: ${r.address} (${r.id})`];
-                          if (r.detectedStatus !== "Unknown" && r.detectedStatus !== r.recordedStatus) {
-                            lines.push(`  - Change status from "${r.recordedStatus}" to "${r.detectedStatus}"`);
-                          }
-                          if (r.currentPrice && r.currentPrice !== r.recordedPrice) {
-                            lines.push(`  - Change price from ${r.recordedPrice} to ${r.currentPrice}`);
-                          }
-                          return lines.join('\n');
-                        }).join('\n\n');
-                        navigator.clipboard.writeText(text);
-                      }}
-                      className="mt-2 bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded font-semibold"
-                    >
-                      📋 Copy to clipboard
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
 
   // ── HOUSE CARD ──────────────────────────────────────────────────────────────
 
@@ -589,9 +327,6 @@ const HouseTrackerApp = () => {
             <button onClick={() => setShowSummaryTable(true)} className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg text-sm">
               <Download size={16} /> Summary
             </button>
-            <button onClick={() => setShowStatusChecker(true)} className="bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-600 hover:to-cyan-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg text-sm">
-              <RefreshCw size={16} /> Validate Price & Status
-            </button>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex gap-3 text-sm border-r pr-4">
@@ -616,7 +351,6 @@ const HouseTrackerApp = () => {
       </div>
 
       {showScoringPreferences && <ScoringPreferencesModal />}
-      {showStatusChecker && <StatusCheckerModal />}
 
       {showFinancials && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
