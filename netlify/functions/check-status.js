@@ -1,57 +1,41 @@
 // netlify/functions/check-status.js
-// Proxies property status check requests to Anthropic API server-side.
-// API key stays secure in Netlify environment variables, never in frontend code.
+// Uses CommonJS exports for maximum Netlify compatibility
 
-export const config = {
-  schedule: undefined,
-  timeout: 26, // seconds — max for Netlify free tier
-};
+exports.handler = async function(event, context) {
+  const headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  };
 
-export default async (req, context) => {
-  // Handle CORS preflight
-  if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
-      },
-    });
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 200, headers, body: "" };
   }
 
-  if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers: { "Content-Type": "application/json" },
-    });
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return new Response(
-      JSON.stringify({ error: "ANTHROPIC_API_KEY not configured in Netlify environment variables" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return { statusCode: 500, headers, body: JSON.stringify({ error: "ANTHROPIC_API_KEY not set" }) };
   }
 
   let house;
   try {
-    const body = await req.json();
+    const body = JSON.parse(event.body);
     house = body.house;
     if (!house || !house.address) throw new Error("Missing house data");
   } catch (e) {
-    return new Response(JSON.stringify({ error: "Invalid request body", details: e.message }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
+    return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid request body", details: e.message }) };
   }
 
   const prompt = `You are checking the current MLS listing status and price of a residential property.
 
 Search the web for the current listing status of this home:
 Address: ${house.address}, ${house.city || "Fishers"}, IN
-Recorded price in my tracker: $${house.price?.toLocaleString() || "unknown"}
+Recorded price in my tracker: $${house.price ? house.price.toLocaleString() : "unknown"}
 Neighborhood: ${house.neighborhood || "unknown"}
 Listing URL: ${house.url}
 
@@ -82,25 +66,19 @@ If you cannot determine the current price, use null for currentPrice.`;
 
     if (!response.ok) {
       const errText = await response.text();
-      return new Response(
-        JSON.stringify({ error: "Anthropic API error", details: errText }),
-        { status: 502, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }
-      );
+      return { statusCode: 502, headers, body: JSON.stringify({ error: "Anthropic API error", details: errText }) };
     }
 
     const data = await response.json();
-
-    // Extract text blocks from response (web_search runs server-side)
     const textBlocks = (data.content || []).filter((b) => b.type === "text");
     const rawText = textBlocks.map((b) => b.text).join("\n");
 
-    // Parse JSON from response
     let parsed = null;
     try {
       const jsonMatch = rawText.match(/\{[\s\S]*?\}/);
       if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
     } catch (e) {
-      // Fall through to Unknown
+      // fall through
     }
 
     const result = {
@@ -110,20 +88,9 @@ If you cannot determine the current price, use null for currentPrice.`;
       reasoning:      parsed?.reasoning      || rawText.slice(0, 150) || "No response",
     };
 
-    return new Response(JSON.stringify(result), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
+    return { statusCode: 200, headers, body: JSON.stringify(result) };
+
   } catch (e) {
-    return new Response(
-      JSON.stringify({ error: "Function error", details: e.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-      }
-    );
+    return { statusCode: 500, headers, body: JSON.stringify({ error: "Function error", details: e.message }) };
   }
 };
