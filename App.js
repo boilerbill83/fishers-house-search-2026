@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import {
   Home, Bed, Bath, Square, Car, X, Calculator, ExternalLink,
-  Target, Sliders, Download,
+  Target, Sliders, Download, MapPin,
 } from "lucide-react";
 import { ALL_PROPERTIES } from "./propertyData";
 
@@ -326,6 +326,9 @@ const HouseTrackerApp = () => {
             </button>
             <button onClick={() => setShowSummaryTable(true)} className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg text-sm">
               <Download size={16} /> Summary
+            </button>
+            <button onClick={() => window.open('/fishers-house-search-2026/map/', '_blank')} className="bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg text-sm">
+              <MapPin size={16} /> Map View
             </button>
           </div>
           <div className="flex items-center gap-4">
