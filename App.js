@@ -210,7 +210,7 @@ const HouseTrackerApp = () => {
           ));
         }
 
-        await new Promise((res) => setTimeout(res, 4000));
+        await new Promise((res) => setTimeout(res, 8000));
       }
 
       setCurrentIndex(-1);
@@ -329,7 +329,9 @@ const HouseTrackerApp = () => {
                       </div>
                     )}
                     {r.reasoning && r.state !== "checking" && (
-                      <p className="text-xs text-gray-500 mt-1 leading-snug">{r.reasoning}</p>
+                      <p className="text-xs text-gray-500 mt-1 leading-snug">
+                        {r.reasoning.startsWith("{") ? "API error — try again" : r.reasoning.slice(0, 120)}
+                      </p>
                     )}
                   </div>
                 </div>
