@@ -47,18 +47,22 @@ export default async (req, context) => {
     });
   }
 
-  const prompt = `You are checking the current MLS listing status of a residential property.
+  const prompt = `You are checking the current MLS listing status and price of a residential property.
 
 Search the web for the current listing status of this home:
 Address: ${house.address}, ${house.city || "Fishers"}, IN
-Price: $${house.price?.toLocaleString() || "unknown"}
+Recorded price in my tracker: $${house.price?.toLocaleString() || "unknown"}
 Neighborhood: ${house.neighborhood || "unknown"}
 Listing URL: ${house.url}
 
-Search Zillow, Redfin, or Realtor.com to find if this property is currently Active (for sale), Pending (under contract), or Sold.
+Search Zillow, Redfin, or Realtor.com to find:
+1. Current status: Active (for sale), Pending (under contract), or Sold
+2. Current listing price as a plain integer (no commas, no dollar sign)
 
 Respond with ONLY this exact JSON and nothing else — no preamble, no markdown:
-{"detectedStatus":"Active|Pending|Sold|Unknown","confidence":"High|Medium|Low","reasoning":"one concise sentence about what you found and where"}`;
+{"detectedStatus":"Active|Pending|Sold|Unknown","currentPrice":500000,"confidence":"High|Medium|Low","reasoning":"one concise sentence about what you found and where"}
+
+If you cannot determine the current price, use null for currentPrice.`;
 
   try {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -101,8 +105,9 @@ Respond with ONLY this exact JSON and nothing else — no preamble, no markdown:
 
     const result = {
       detectedStatus: parsed?.detectedStatus || "Unknown",
-      confidence: parsed?.confidence || "Low",
-      reasoning: parsed?.reasoning || rawText.slice(0, 150) || "No response",
+      currentPrice:   parsed?.currentPrice   || null,
+      confidence:     parsed?.confidence     || "Low",
+      reasoning:      parsed?.reasoning      || rawText.slice(0, 150) || "No response",
     };
 
     return new Response(JSON.stringify(result), {
