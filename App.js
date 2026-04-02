@@ -210,7 +210,7 @@ const HouseTrackerApp = () => {
           ));
         }
 
-        await new Promise((res) => setTimeout(res, 15000));
+        await new Promise((res) => setTimeout(res, 60000));
       }
 
       setCurrentIndex(-1);
@@ -274,7 +274,7 @@ const HouseTrackerApp = () => {
               <p className="text-gray-600 max-w-sm">
                 Checks all <strong>{houses.length} properties</strong> one by one using live web search to verify current listing status.
               </p>
-              <p className="text-gray-400 text-sm">Takes about {Math.ceil(houses.length * 2)}–{houses.length * 3} seconds</p>
+              <p className="text-gray-400 text-sm">Takes about 16 minutes (1 minute per property to avoid rate limits)</p>
               <button
                 onClick={checkAllStatuses}
                 className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg flex items-center gap-2"
