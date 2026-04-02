@@ -111,6 +111,14 @@
 
 <div id="map"></div>
 
+<!-- Map Type Buttons -->
+<div id="map-type-btns">
+  <button class="map-type-btn active-type" id="btn-roadmap"  onclick="setMapType('roadmap')">Road</button>
+  <button class="map-type-btn" id="btn-satellite" onclick="setMapType('satellite')">Satellite</button>
+  <button class="map-type-btn" id="btn-hybrid"    onclick="setMapType('hybrid')">Hybrid</button>
+  <button class="map-type-btn" id="btn-terrain"   onclick="setMapType('terrain')">Terrain</button>
+</div>
+
 <!-- Toolbar -->
 <div id="toolbar">
   <h1>🏡 House Hunt Map</h1>
@@ -124,14 +132,6 @@
 </div>
 
 <!-- Legend -->
-<!-- Map Type Buttons -->
-<div id="map-type-btns">
-  <button class="map-type-btn active-type" id="btn-roadmap"  onclick="setMapType('roadmap')">Road</button>
-  <button class="map-type-btn" id="btn-satellite" onclick="setMapType('satellite')">Satellite</button>
-  <button class="map-type-btn" id="btn-hybrid"    onclick="setMapType('hybrid')">Hybrid</button>
-  <button class="map-type-btn" id="btn-terrain"   onclick="setMapType('terrain')">Terrain</button>
-</div>
-
 <div id="legend">
   <h3>Legend</h3>
   <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Active</div>
