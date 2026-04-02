@@ -156,7 +156,7 @@ const HouseTrackerApp = () => {
       setRunning(true);
       setDone(false);
 
-      for (let i = 0; i < 1; i++) {
+      for (let i = 0; i < houses.length; i++) {
         const house = houses[i];
         setCurrentIndex(i);
 
@@ -210,7 +210,7 @@ const HouseTrackerApp = () => {
           ));
         }
 
-        await new Promise((res) => setTimeout(res, 800));
+        await new Promise((res) => setTimeout(res, 4000));
       }
 
       setCurrentIndex(-1);
