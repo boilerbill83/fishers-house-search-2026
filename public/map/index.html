@@ -109,11 +109,9 @@
 
 <script>
 // ── PROPERTY DATA ────────────────────────────────────────────────────────────
-// window.ALL_PROPERTIES is loaded from propertyData.js (injected by webpack)
-const PROPERTIES = (window.ALL_PROPERTIES || []).map(p => ({
-  ...p,
-  zillow: p.zillowLink,
-}));
+// window.ALL_PROPERTIES is set by propertyData.js loaded via <script> tag above
+// PROPERTIES is populated inside initMap to ensure the script has loaded
+let PROPERTIES = [];
 
 const YOUR_HOME = { address:"8038 Springwater Dr W", city:"Indianapolis, IN 46256", lat:39.93890, lng:-85.96270 };
 
@@ -218,6 +216,16 @@ function updateStats() {
 
 // ── INIT MAP ──────────────────────────────────────────────────────────────────
 function initMap() {
+  // Build PROPERTIES from window.ALL_PROPERTIES (set by propertyData.js)
+  PROPERTIES = (window.ALL_PROPERTIES || []).map(p => ({
+    ...p,
+    zillow: p.zillowLink,
+  }));
+
+  if (PROPERTIES.length === 0) {
+    console.error('propertyData.js failed to load — window.ALL_PROPERTIES is empty');
+  }
+
   map = new google.maps.Map(document.getElementById('map'), {
     center: { lat: 39.9600, lng: -85.9750 },
     zoom: 12,
