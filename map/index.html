@@ -67,10 +67,37 @@
     .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; color: #334155; font-weight: 500; }
     .legend-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.15); flex-shrink: 0; }
 
+    /* Map Type Buttons */
+    #map-type-btns {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 10;
+      display: flex;
+      gap: 4px;
+      background: white;
+      border-radius: 10px;
+      padding: 5px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+    .map-type-btn {
+      border: none;
+      border-radius: 7px;
+      padding: 6px 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: transparent;
+      color: #475569;
+    }
+    .map-type-btn:hover { background: #f1f5f9; }
+    .map-type-btn.active-type { background: #2563eb; color: white; }
+
     /* Info window overrides */
     .gm-style .gm-style-iw-c { border-radius: 12px !important; padding: 0 !important; max-width: 280px !important; }
     .gm-style .gm-style-iw-d { overflow: hidden !important; }
-    .gm-style .gm-style-iw-t::after { display: none; }</style></head><body><div id="map"></div><div id="toolbar"><h1>🏡 House Hunt Map</h1><div class="divider"></div><div class="stat"><div class="stat-num green" id="cnt-active">0</div><div class="stat-label">Active</div></div><div class="stat"><div class="stat-num amber" id="cnt-pending">0</div><div class="stat-label">Pending</div></div><div class="stat"><div class="stat-num gray" id="cnt-sold">0</div><div class="stat-label">Sold</div></div><div class="divider"></div><button class="filter-btn active-filter" id="btn-all" onclick="setFilter('all')">Show All</button> <button class="filter-btn inactive-filter" id="btn-active" onclick="setFilter('active')">Active Only</button></div><div id="legend"><h3>Legend</h3><div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Active</div><div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Pending</div><div class="legend-item"><div class="legend-dot" style="background:#94a3b8"></div>Sold</div></div><script>// propertyData.js
+    .gm-style .gm-style-iw-t::after { display: none; }</style></head><body><div id="map"></div><div id="toolbar"><h1>🏡 House Hunt Map</h1><div class="divider"></div><div class="stat"><div class="stat-num green" id="cnt-active">0</div><div class="stat-label">Active</div></div><div class="stat"><div class="stat-num amber" id="cnt-pending">0</div><div class="stat-label">Pending</div></div><div class="stat"><div class="stat-num gray" id="cnt-sold">0</div><div class="stat-label">Sold</div></div><div class="divider"></div><button class="filter-btn active-filter" id="btn-all" onclick="setFilter('all')">Show All</button> <button class="filter-btn inactive-filter" id="btn-active" onclick="setFilter('active')">Active Only</button></div><div id="map-type-btns"><button class="map-type-btn active-type" id="btn-roadmap" onclick="setMapType('roadmap')">Road</button> <button class="map-type-btn" id="btn-satellite" onclick="setMapType('satellite')">Satellite</button> <button class="map-type-btn" id="btn-hybrid" onclick="setMapType('hybrid')">Hybrid</button> <button class="map-type-btn" id="btn-terrain" onclick="setMapType('terrain')">Terrain</button></div><div id="legend"><h3>Legend</h3><div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Active</div><div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Pending</div><div class="legend-item"><div class="legend-dot" style="background:#94a3b8"></div>Sold</div></div><script>// propertyData.js
 // Last verified: April 2, 2026 via manual web + MLS mirror search
 
 window.ALL_PROPERTIES = [
@@ -751,6 +778,15 @@ function updateStats() {
   document.getElementById('cnt-sold').textContent    = PROPERTIES.filter(p => p.status === 'Sold').length;
 }
 
+// ── MAP TYPE ─────────────────────────────────────────────────────────────────
+function setMapType(type) {
+  map.setMapTypeId(type);
+  ['roadmap','satellite','hybrid','terrain'].forEach(t => {
+    document.getElementById('btn-' + t).className =
+      'map-type-btn' + (t === type ? ' active-type' : '');
+  });
+}
+
 // ── INIT MAP ──────────────────────────────────────────────────────────────────
 function initMap() {
   // Build PROPERTIES from window.ALL_PROPERTIES (set by propertyData.js)
@@ -769,11 +805,7 @@ function initMap() {
     center: { lat: 39.9600, lng: -85.9750 },
     zoom: 12,
     mapTypeId: 'roadmap',
-    mapTypeControl: true,
-    mapTypeControlOptions: {
-      style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-      position: google.maps.ControlPosition.TOP_RIGHT,
-    },
+    mapTypeControl: false,
     fullscreenControl: false,
     streetViewControl: true,
     zoomControl: true,
