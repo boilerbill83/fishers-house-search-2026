@@ -1,6 +1,4 @@
 // netlify/functions/check-status.js
-// Uses CommonJS exports for maximum Netlify compatibility
-
 exports.handler = async function(event, context) {
   const headers = {
     "Content-Type": "application/json",
@@ -64,12 +62,21 @@ If you cannot determine the current price, use null for currentPrice.`;
       }),
     });
 
+    const data = await response.json();
+
+    // Handle rate limit specifically
     if (!response.ok) {
-      const errText = await response.text();
-      return { statusCode: 502, headers, body: JSON.stringify({ error: "Anthropic API error", details: errText }) };
+      const isRateLimit = data?.error?.type === "rate_limit_error";
+      return {
+        statusCode: response.status,
+        headers,
+        body: JSON.stringify({
+          error: isRateLimit ? "Rate limit hit — try again in a moment" : "Anthropic API error",
+          details: isRateLimit ? "Rate limited" : JSON.stringify(data),
+        }),
+      };
     }
 
-    const data = await response.json();
     const textBlocks = (data.content || []).filter((b) => b.type === "text");
     const rawText = textBlocks.map((b) => b.text).join("\n");
 
@@ -81,14 +88,16 @@ If you cannot determine the current price, use null for currentPrice.`;
       // fall through
     }
 
-    const result = {
-      detectedStatus: parsed?.detectedStatus || "Unknown",
-      currentPrice:   parsed?.currentPrice   || null,
-      confidence:     parsed?.confidence     || "Low",
-      reasoning:      parsed?.reasoning      || rawText.slice(0, 150) || "No response",
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        detectedStatus: parsed?.detectedStatus || "Unknown",
+        currentPrice:   parsed?.currentPrice   || null,
+        confidence:     parsed?.confidence     || "Low",
+        reasoning:      parsed?.reasoning      || rawText.slice(0, 150) || "No response",
+      }),
     };
-
-    return { statusCode: 200, headers, body: JSON.stringify(result) };
 
   } catch (e) {
     return { statusCode: 500, headers, body: JSON.stringify({ error: "Function error", details: e.message }) };
