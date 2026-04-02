@@ -38,11 +38,12 @@ module.exports = {
         {
           from: "propertyData.js",
           to: "map/propertyData.js",
-          // Transform: strip ES module syntax, expose as global window.ALL_PROPERTIES
           transform(content) {
+            // Convert ES module export to global window variable
+            // so the standalone map HTML can load it as a plain <script>
             return content
               .toString()
-              .replace("export const ALL_PROPERTIES", "window.ALL_PROPERTIES");
+              .replace(/export\s+const\s+ALL_PROPERTIES/, "window.ALL_PROPERTIES");
           },
         },
       ],
