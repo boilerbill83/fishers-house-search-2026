@@ -156,7 +156,7 @@ const HouseTrackerApp = () => {
       setRunning(true);
       setDone(false);
 
-      for (let i = 0; i < houses.length; i++) {
+      for (let i = 0; i < 1; i++) {
         const house = houses[i];
         setCurrentIndex(i);
 
@@ -165,7 +165,9 @@ const HouseTrackerApp = () => {
           id: house.id,
           address: house.address,
           recordedStatus: house.status,
+          recordedPrice: house.price,
           detectedStatus: null,
+          currentPrice: null,
           confidence: null,
           reasoning: null,
           state: "checking",
@@ -192,11 +194,13 @@ const HouseTrackerApp = () => {
           const data = await resp.json();
           if (!resp.ok) throw new Error(data.details || data.error || `HTTP ${resp.status}`);
 
-          const { detectedStatus, confidence, reasoning } = data;
-          const changed = detectedStatus !== "Unknown" && detectedStatus !== house.status;
+          const { detectedStatus, currentPrice, confidence, reasoning } = data;
+          const statusChanged = detectedStatus !== "Unknown" && detectedStatus !== house.status;
+          const priceChanged = currentPrice && currentPrice !== house.price;
+          const changed = statusChanged || priceChanged;
 
           setResults((prev) => prev.map((r) => r.id === house.id
-            ? { ...r, detectedStatus, confidence, reasoning, state: changed ? "changed" : "confirmed" }
+            ? { ...r, detectedStatus, currentPrice, confidence, reasoning, state: changed ? "changed" : "confirmed" }
             : r
           ));
         } catch (err) {
@@ -275,7 +279,7 @@ const HouseTrackerApp = () => {
                 onClick={checkAllStatuses}
                 className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg flex items-center gap-2"
               >
-                <RefreshCw size={18} /> Start Status Check
+                <RefreshCw size={18} /> Start Validation
               </button>
             </div>
           )}
@@ -314,6 +318,16 @@ const HouseTrackerApp = () => {
                       )}
                     </div>
                     {r.state === "checking" && <p className="text-xs text-blue-400 mt-0.5">Searching…</p>}
+                    {r.state !== "checking" && r.currentPrice && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-gray-500">Price: <span className="font-medium text-gray-700">${r.recordedPrice?.toLocaleString()}</span> recorded</span>
+                        {r.currentPrice !== r.recordedPrice ? (
+                          <span className="text-xs font-bold text-amber-600">→ ${r.currentPrice?.toLocaleString()} now ⚠️</span>
+                        ) : (
+                          <span className="text-xs text-green-600">✓ price unchanged</span>
+                        )}
+                      </div>
+                    )}
                     {r.reasoning && r.state !== "checking" && (
                       <p className="text-xs text-gray-500 mt-1 leading-snug">{r.reasoning}</p>
                     )}
@@ -323,24 +337,63 @@ const HouseTrackerApp = () => {
             </div>
           )}
 
-          {done && changed.length > 0 && (
-            <div className="p-4 border-t bg-amber-50 rounded-b-xl">
-              <p className="text-sm text-amber-800 font-medium">
-                ⚠️ {changed.length} propert{changed.length === 1 ? "y needs" : "ies need"} updating in propertyData.js:
-              </p>
-              <ul className="mt-2 space-y-1">
-                {changed.map((r) => (
-                  <li key={r.id} className="text-xs text-amber-700">
-                    • <strong>{r.address}</strong>: {r.recordedStatus} → <strong>{r.detectedStatus}</strong>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {done && changed.length === 0 && errors.length === 0 && (
-            <div className="p-4 border-t bg-green-50 rounded-b-xl text-center">
-              <p className="text-sm text-green-700 font-medium">✅ All statuses confirmed — your tracker is up to date!</p>
+          {done && (
+            <div className={`p-4 border-t rounded-b-xl ${changed.length > 0 ? "bg-amber-50" : "bg-green-50"}`}>
+              {changed.length === 0 && errors.length === 0 ? (
+                <p className="text-sm text-green-700 font-medium">✅ All prices and statuses confirmed — your tracker is up to date!</p>
+              ) : (
+                <>
+                  <p className="text-sm text-amber-800 font-semibold mb-2">
+                    ⚠️ {changed.length} propert{changed.length === 1 ? "y needs" : "ies need"} updating in propertyData.js:
+                  </p>
+                  <ul className="mb-3 space-y-1">
+                    {changed.map((r) => (
+                      <li key={r.id} className="text-xs text-amber-700">
+                        • <strong>{r.address}</strong>
+                        {r.recordedStatus !== r.detectedStatus && r.detectedStatus !== "Unknown" && (
+                          <span>: status {r.recordedStatus} → <strong>{r.detectedStatus}</strong></span>
+                        )}
+                        {r.currentPrice && r.currentPrice !== r.recordedPrice && (
+                          <span className="ml-1">| price ${r.recordedPrice?.toLocaleString()} → <strong>${r.currentPrice?.toLocaleString()}</strong></span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="border-t border-amber-200 pt-3">
+                    <p className="text-xs text-amber-700 font-semibold mb-1">📋 Copy & paste into Claude to update propertyData.js:</p>
+                    <pre className="text-xs bg-white border border-amber-200 rounded p-2 whitespace-pre-wrap text-gray-700 font-mono max-h-40 overflow-y-auto">
+                      {changed.map(r => {
+                        const lines = [`Property: ${r.address} (${r.id})`];
+                        if (r.detectedStatus !== "Unknown" && r.detectedStatus !== r.recordedStatus) {
+                          lines.push(`  - Change status from "${r.recordedStatus}" to "${r.detectedStatus}"`);
+                        }
+                        if (r.currentPrice && r.currentPrice !== r.recordedPrice) {
+                          lines.push(`  - Change price from ${r.recordedPrice} to ${r.currentPrice}`);
+                        }
+                        return lines.join('\n');
+                      }).join('\n\n')}
+                    </pre>
+                    <button
+                      onClick={() => {
+                        const text = changed.map(r => {
+                          const lines = [`Property: ${r.address} (${r.id})`];
+                          if (r.detectedStatus !== "Unknown" && r.detectedStatus !== r.recordedStatus) {
+                            lines.push(`  - Change status from "${r.recordedStatus}" to "${r.detectedStatus}"`);
+                          }
+                          if (r.currentPrice && r.currentPrice !== r.recordedPrice) {
+                            lines.push(`  - Change price from ${r.recordedPrice} to ${r.currentPrice}`);
+                          }
+                          return lines.join('\n');
+                        }).join('\n\n');
+                        navigator.clipboard.writeText(text);
+                      }}
+                      className="mt-2 bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded font-semibold"
+                    >
+                      📋 Copy to clipboard
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -535,7 +588,7 @@ const HouseTrackerApp = () => {
               <Download size={16} /> Summary
             </button>
             <button onClick={() => setShowStatusChecker(true)} className="bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-600 hover:to-cyan-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg text-sm">
-              <RefreshCw size={16} /> Check Status
+              <RefreshCw size={16} /> Validate Price & Status
             </button>
           </div>
           <div className="flex items-center gap-4">
