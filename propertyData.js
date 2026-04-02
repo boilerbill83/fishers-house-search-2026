@@ -3,7 +3,6 @@
 
 export const ALL_PROPERTIES = [
   {
-    // MLS 22045126 — Active
     id: "prop_004",
     address: "12880 Oxbridge Pl",
     city: "Fishers",
@@ -13,7 +12,7 @@ export const ALL_PROPERTIES = [
     sqft: 3430,
     garage: 2,
     yearBuilt: 2004,
-    hoaAnnual: 696, // 58/mo ≈ 696/yr primary HOA
+    hoaAnnual: 696,
     lotSize: 0.25,
     basement: "Finished",
     neighborhood: "Avalon of Fishers",
@@ -45,7 +44,6 @@ export const ALL_PROPERTIES = [
     listingDate: "2025-06-15",
   },
   {
-    // MLS 22065730 — Off Market (was Active at 525k)
     id: "prop_006",
     address: "10272 Whitetail Cir",
     city: "Fishers",
@@ -61,7 +59,7 @@ export const ALL_PROPERTIES = [
     neighborhood: "Woods Edge At Windermere",
     schools: "Hamilton Southeastern",
     commuteHusband: 38,
-    status: "Off Market",
+    status: "Sold",
     daysOnMarket: "Active",
     walkScore: 8,
     bikeScore: 36,
@@ -82,7 +80,6 @@ export const ALL_PROPERTIES = [
     listingDate: "2025-10-15",
   },
   {
-    // MLS 22070213 — Pending
     id: "prop_009",
     address: "10747 Red Pine Dr",
     city: "Fishers",
@@ -122,7 +119,6 @@ export const ALL_PROPERTIES = [
     listingDate: "2025-10-31",
   },
   {
-    // MLS 22082902 — Active
     id: "prop_010",
     address: "11987 Bird Key Blvd",
     city: "Fishers",
@@ -132,7 +128,7 @@ export const ALL_PROPERTIES = [
     sqft: 3618,
     garage: 2,
     yearBuilt: 2004,
-    hoaAnnual: 768, // ~64/mo
+    hoaAnnual: 768,
     lotSize: 0.27,
     basement: "Finished",
     neighborhood: "Rolling Knoll",
@@ -147,11 +143,9 @@ export const ALL_PROPERTIES = [
     notes: "Brick home with finished basement.",
     pros: [],
     cons: [],
-    priceHistory: [
-      { date: "2026-03-19", oldPrice: 584000, newPrice: 578000 },
-    ],
+    priceHistory: [{ date: "2026-03-19", oldPrice: 584000, newPrice: 578000 }],
     favorite: false,
-    pricePerSqft: 160, // 578000 / 3618 ≈ 160
+    pricePerSqft: 160,
     imageUrl: "https://ssl.cdn-redfin.com/photo/147/bigphoto/902/22082902_0.jpg",
     latitude: 39.96291071302564,
     longitude: -85.969532246657,
@@ -161,7 +155,6 @@ export const ALL_PROPERTIES = [
     listingDate: "2026-01-26",
   },
   {
-    // MLS 22083480 — Pending
     id: "prop_012",
     address: "12997 Bartlett Dr",
     city: "Fishers",
@@ -201,11 +194,10 @@ export const ALL_PROPERTIES = [
     listingDate: "2026-02-12",
   },
   {
-    // MLS 22068876 — Sold 4/1/26
     id: "prop_014",
     address: "10480 Creektree Ln",
     city: "Fishers",
-    price: 615000, // sold price
+    price: 615000,
     beds: 4,
     baths: 3,
     sqft: 4217,
@@ -231,7 +223,7 @@ export const ALL_PROPERTIES = [
       { date: "2026-04-01", oldPrice: 600000, newPrice: 615000, event: "Sold" },
     ],
     favorite: false,
-    pricePerSqft: 146, // 615000 / 4217 ≈ 146
+    pricePerSqft: 146,
     imageUrl: "https://cflare.smarteragent.com/rest/Resizer?sig_id=69&quality=0.8&url=https://storage.googleapis.com/slp5-stream-listing-media-prod/MLSGrid/190/22068876/photo/media/0_4261413115053874048.jpg&width=1000",
     latitude: 39.983606286476395,
     longitude: -85.98258444665584,
@@ -241,7 +233,6 @@ export const ALL_PROPERTIES = [
     listingDate: "2026-02-27",
   },
   {
-    // MLS 22082152 — Pending
     id: "prop_015",
     address: "10236 Bent Tree Ln",
     city: "Fishers",
@@ -251,7 +242,7 @@ export const ALL_PROPERTIES = [
     sqft: 4209,
     garage: 3,
     yearBuilt: 1995,
-    hoaAnnual: 552, // ≈46/mo
+    hoaAnnual: 552,
     lotSize: 0.31,
     basement: "Finished",
     neighborhood: "Woods Edge At Windermere",
@@ -281,7 +272,6 @@ export const ALL_PROPERTIES = [
     listingDate: "2026-02-12",
   },
   {
-    // MLS 22087220 — Pending at 495K
     id: "prop_016",
     address: "12033 Flintstone Ct",
     city: "Fishers",
@@ -312,7 +302,7 @@ export const ALL_PROPERTIES = [
       { date: "2026-03-23", event: "Pending" },
     ],
     favorite: false,
-    pricePerSqft: 146, // 495000 / 3382 ≈ 146
+    pricePerSqft: 146,
     imageUrl: "https://photos.talktotucker.com/medium/mibor/22087220/12033-flint-stone-court-fishers-46037-ccb528d0-b8b7-4b83-ba0b-dfa5c931ccb8-0.jpeg",
     latitude: 39.96388970331086,
     longitude: -85.94847674665694,
@@ -322,7 +312,6 @@ export const ALL_PROPERTIES = [
     listingDate: "2026-03-06",
   },
   {
-    // MLS 22088523 — Active (went Pending, now back Active)
     id: "prop_017",
     address: "9943 Deering St",
     city: "Fishers",
@@ -338,7 +327,7 @@ export const ALL_PROPERTIES = [
     neighborhood: "Spyglass Hill",
     schools: "Hamilton Southeastern",
     commuteHusband: 33,
-    status: "Active",
+    status: "Pending",
     daysOnMarket: "Active",
     walkScore: 15,
     bikeScore: 57,
@@ -363,7 +352,6 @@ export const ALL_PROPERTIES = [
     listingDate: "2026-03-13",
   },
   {
-    // MLS 22088967 — Pending
     id: "prop_018",
     address: "13374 Landwood Dr",
     city: "Fishers",
@@ -373,7 +361,7 @@ export const ALL_PROPERTIES = [
     sqft: 4276,
     garage: 3,
     yearBuilt: 2000,
-    hoaAnnual: 475, // per MLS/Compass
+    hoaAnnual: 475,
     lotSize: 0.28,
     basement: "Finished",
     neighborhood: "Links at Gray Eagle",
@@ -404,7 +392,6 @@ export const ALL_PROPERTIES = [
     listingDate: "2026-03-13",
   },
   {
-    // MLS 22087886 — Pending
     id: "prop_019",
     address: "11008 Stratford Way",
     city: "Fishers",
@@ -440,7 +427,6 @@ export const ALL_PROPERTIES = [
     listingDate: "2026-03-09",
   },
   {
-    // MLS 22089401 — Pending
     id: "prop_020",
     address: "10970 Andrews Pl",
     city: "Fishers",
@@ -465,9 +451,7 @@ export const ALL_PROPERTIES = [
     notes: "Corner lot in Walnut Creek with finished basement.",
     pros: [],
     cons: [],
-    priceHistory: [
-      { date: "2026-03-19", price: 580000, event: "Listed" },
-    ],
+    priceHistory: [{ date: "2026-03-19", price: 580000, event: "Listed" }],
     favorite: false,
     pricePerSqft: 134,
     imageUrl: "https://photos.talktotucker.com/medium/mibor/22089401/10970-andrews-place-fishers-46037-f55b4e71-b410-4df8-afd3-31606ac3fdd2-0.jpeg",
@@ -478,7 +462,6 @@ export const ALL_PROPERTIES = [
     listingDate: "2026-03-19",
   },
   {
-    // MLS 22089911 — Pending
     id: "prop_021",
     address: "11750 Belle Plaine Blvd",
     city: "Fishers",
@@ -494,7 +477,7 @@ export const ALL_PROPERTIES = [
     neighborhood: "Rolling Knoll",
     schools: "Hamilton Southeastern",
     commuteHusband: 34,
-    status: "Pending",
+    status: "Sold",
     daysOnMarket: "Active",
     walkScore: 15,
     bikeScore: 59,
@@ -514,7 +497,6 @@ export const ALL_PROPERTIES = [
     listingDate: "2026-03-18",
   },
   {
-    // MLS 22087784 — Active
     id: "prop_022",
     address: "12992 Minden Dr",
     city: "Fishers",
@@ -539,10 +521,7 @@ export const ALL_PROPERTIES = [
     notes: "Walkable to community pool, 2 playgrounds, Witten Park, trails, Saxony Pizzeria & Boom Town Donuts. New staircase, carpet, appliances (March 2026), new roof (2020).",
     pros: [],
     cons: [],
-    priceHistory: [
-      { date: "2026-03-20", price: 575000, event: "Listed" },
-      // pending event removed based on current Active status
-    ],
+    priceHistory: [{ date: "2026-03-20", price: 575000, event: "Listed" }],
     favorite: false,
     pricePerSqft: 132,
     imageUrl: "https://photos.talktotucker.com/medium/mibor/22087784/12992-minden-drive-fishers-46037-3d2001ae-1f75-4dce-a851-e64626860522-0.jpeg",
@@ -553,7 +532,6 @@ export const ALL_PROPERTIES = [
     listingDate: "2026-03-20",
   },
   {
-    // MLS 22088607 — Pending (per your MLS view and broker feeds)
     id: "prop_023",
     address: "14211 Monarchy Ln",
     city: "Fishers",
@@ -592,7 +570,6 @@ export const ALL_PROPERTIES = [
     listingDate: "2026-03-20",
   },
   {
-    // MLS 22087129 — Active
     id: "prop_024",
     address: "9767 Fortune Dr",
     city: "Fishers",
@@ -602,7 +579,7 @@ export const ALL_PROPERTIES = [
     sqft: 4340,
     garage: 3,
     yearBuilt: 1995,
-    hoaAnnual: 660, // ≈55/mo
+    hoaAnnual: 660,
     lotSize: 0.42,
     basement: "Finished",
     neighborhood: "Walnut Creek",
@@ -613,7 +590,7 @@ export const ALL_PROPERTIES = [
     walkScore: 5,
     bikeScore: 45,
     hasNeighborhoodPool: false,
-    zillowLink: "https://www.zillow.com/homedetails/9767-Fortune-Dr-Fishers-IN-46037/73259878_zpid/",
+    zillowLink: "https://www.zillow.com/homedetails/9767-Fortune-Dr-Fishers-IN-46037/73267542_zpid/",
     notes: "Large lot with mature trees in Walnut Creek.",
     pros: [],
     cons: [],
