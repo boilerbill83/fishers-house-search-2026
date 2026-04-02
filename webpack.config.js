@@ -35,7 +35,16 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: "public/map", to: "map" },
-        { from: "propertyData.js", to: "map/propertyData.js" },
+        {
+          from: "propertyData.js",
+          to: "map/propertyData.js",
+          // Transform: strip ES module syntax, expose as global window.ALL_PROPERTIES
+          transform(content) {
+            return content
+              .toString()
+              .replace("export const ALL_PROPERTIES", "window.ALL_PROPERTIES");
+          },
+        },
       ],
     }),
   ],
