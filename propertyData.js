@@ -1,8 +1,9 @@
 // propertyData.js
-// Last verified: April 2, 2026 via manual web search
+// Last verified: April 2, 2026 via manual web + MLS mirror search
 
 export const ALL_PROPERTIES = [
   {
+    // MLS 22045126 — Active
     id: "prop_004",
     address: "12880 Oxbridge Pl",
     city: "Fishers",
@@ -12,7 +13,7 @@ export const ALL_PROPERTIES = [
     sqft: 3430,
     garage: 2,
     yearBuilt: 2004,
-    hoaAnnual: 700, // 175/qtr ≈ 700/yr primary HOA
+    hoaAnnual: 696, // 58/mo ≈ 696/yr primary HOA
     lotSize: 0.25,
     basement: "Finished",
     neighborhood: "Avalon of Fishers",
@@ -32,7 +33,6 @@ export const ALL_PROPERTIES = [
       { date: "2025-07-30", oldPrice: 469000, newPrice: 464000 },
       { date: "2025-10-05", oldPrice: 464000, newPrice: 454900 },
       { date: "2025-10-16", oldPrice: 454900, newPrice: 449900 },
-      // Your current 444,900 reflects most recent adjustment; portals lag a bit
     ],
     favorite: false,
     pricePerSqft: 130,
@@ -41,10 +41,11 @@ export const ALL_PROPERTIES = [
     longitude: -85.91614624665627,
     coordinateVerified: false,
     amenities: { parks: true, trails: true, shopping: true, restaurants: true, communityEvents: true },
-    history: { daysOnMarket: 89, lastPriceChange: "2025-10-16", priceChanges: [], views: 0 },
+    history: { daysOnMarket: 292, lastPriceChange: "2025-10-16", priceChanges: [], views: 0 },
     listingDate: "2025-06-15",
   },
   {
+    // MLS 22065730 — Off Market (was Active at 525k)
     id: "prop_006",
     address: "10272 Whitetail Cir",
     city: "Fishers",
@@ -60,7 +61,7 @@ export const ALL_PROPERTIES = [
     neighborhood: "Woods Edge At Windermere",
     schools: "Hamilton Southeastern",
     commuteHusband: 38,
-    status: "Active",
+    status: "Off Market",
     daysOnMarket: "Active",
     walkScore: 8,
     bikeScore: 36,
@@ -81,7 +82,7 @@ export const ALL_PROPERTIES = [
     listingDate: "2025-10-15",
   },
   {
-    // Verified 4/2/2026: Pending at $475K (price cut from $500K)
+    // MLS 22070213 — Pending
     id: "prop_009",
     address: "10747 Red Pine Dr",
     city: "Fishers",
@@ -102,7 +103,7 @@ export const ALL_PROPERTIES = [
     walkScore: 8,
     bikeScore: 55,
     hasNeighborhoodPool: false,
-    zillowLink: "https://www.zillow.com/homedetails/10747-Red-Pine-Dr-Fishers-IN-46037/73228273_zpid/",
+    zillowLink: "https://www.zillow.com/homeddetails/10747-Red-Pine-Dr-Fishers-IN-46037/73228273_zpid/",
     notes: "5 bedroom home with finished walkout basement. Near Windermere golf course.",
     pros: [],
     cons: [],
@@ -117,11 +118,11 @@ export const ALL_PROPERTIES = [
     longitude: -85.99661627734538,
     coordinateVerified: false,
     amenities: { parks: true, trails: true, shopping: false, restaurants: false, communityEvents: true },
-    history: { daysOnMarket: 37, lastPriceChange: "2026-01-21", priceChanges: [], views: 0 },
+    history: { daysOnMarket: 144, lastPriceChange: "2026-01-21", priceChanges: [], views: 0 },
     listingDate: "2025-10-31",
   },
   {
-    // Verified 4/2/2026: Active $578K (price cut from $584K)
+    // MLS 22082902 — Active
     id: "prop_010",
     address: "11987 Bird Key Blvd",
     city: "Fishers",
@@ -142,7 +143,7 @@ export const ALL_PROPERTIES = [
     walkScore: 14,
     bikeScore: 53,
     hasNeighborhoodPool: true,
-    zillowLink: "https://www.zillow.com/homedetails/11987-Bird-Key-Blvd-Fishers-IN-46037/73249041_zpid/",
+    zillowLink: "https://www.zillow.com/homedetails/11987-Bird-Key-Blvd-Fishers-IN-46037/73249194_zpid/",
     notes: "Brick home with finished basement.",
     pros: [],
     cons: [],
@@ -156,11 +157,11 @@ export const ALL_PROPERTIES = [
     longitude: -85.969532246657,
     coordinateVerified: false,
     amenities: { parks: true, trails: true, shopping: true, restaurants: true, communityEvents: true },
-    history: { daysOnMarket: 52, lastPriceChange: "2026-03-19", priceChanges: [], views: 0 },
+    history: { daysOnMarket: 55, lastPriceChange: "2026-03-19", priceChanges: [], views: 0 },
     listingDate: "2026-01-26",
   },
   {
-    // Verified 4/2/2026: Now Pending at $474,900 (per your screenshot; portals lag)
+    // MLS 22083480 — Pending
     id: "prop_012",
     address: "12997 Bartlett Dr",
     city: "Fishers",
@@ -168,7 +169,7 @@ export const ALL_PROPERTIES = [
     beds: 5,
     baths: 3,
     sqft: 4042,
-    garage: 2,
+    garage: 3,
     yearBuilt: 2007,
     hoaAnnual: 610,
     lotSize: 0.23,
@@ -185,22 +186,26 @@ export const ALL_PROPERTIES = [
     notes: "Large 5BR home in Tanglewood.",
     pros: [],
     cons: [],
-    priceHistory: [{ date: "2025-10-15", price: 479900, event: "Listed" }],
+    priceHistory: [
+      { date: "2025-08-07", oldPrice: 488900, newPrice: 469900 },
+      { date: "2025-10-03", oldPrice: 469900, newPrice: 469900 },
+      { date: "2026-02-12", price: 474900, event: "Relisted" },
+    ],
     favorite: false,
     pricePerSqft: 117,
     imageUrl: "https://images-listings.coldwellbanker.com/IN_MIBOR/22/08/34/80/_P/22083480_P00.jpg",
     latitude: 39.985,
     longitude: -86.0125,
     amenities: { parks: true, trails: false, shopping: true, restaurants: true, communityEvents: true },
-    history: { daysOnMarket: 156, lastPriceChange: null, priceChanges: [], views: 1069 },
+    history: { daysOnMarket: 48, lastPriceChange: "2026-02-12", priceChanges: [], views: 0 },
     listingDate: "2026-02-12",
   },
   {
-    // Verified 4/2/2026: Confirmed Pending $600K, subdivision = Rosewood
+    // MLS 22068876 — Sold 4/1/26
     id: "prop_014",
     address: "10480 Creektree Ln",
     city: "Fishers",
-    price: 600000,
+    price: 615000, // sold price
     beds: 4,
     baths: 3,
     sqft: 4217,
@@ -212,28 +217,31 @@ export const ALL_PROPERTIES = [
     neighborhood: "Rosewood",
     schools: "Hamilton Southeastern",
     commuteHusband: 40,
-    status: "Pending",
+    status: "Sold",
     daysOnMarket: "Active",
     walkScore: 8,
     bikeScore: 53,
     hasNeighborhoodPool: false,
-    zillowLink: "https://www.zillow.com/homedetails/10480-Creektree-Ln-Fishers-IN-46038/73262874_zpid/",
-    notes: "Recently listed Rosewood home.",
+    zillowLink: "https://www.zillow.com/homedetails/10480-Creektree-Ln-Fishers-IN-46038/73248900_zpid/",
+    notes: "Rosewood home sold April 1, 2026.",
     pros: [],
     cons: [],
-    priceHistory: [],
+    priceHistory: [
+      { date: "2026-02-23", price: 600000, event: "Listed" },
+      { date: "2026-04-01", oldPrice: 600000, newPrice: 615000, event: "Sold" },
+    ],
     favorite: false,
-    pricePerSqft: 142,
+    pricePerSqft: 146, // 615000 / 4217 ≈ 146
     imageUrl: "https://cflare.smarteragent.com/rest/Resizer?sig_id=69&quality=0.8&url=https://storage.googleapis.com/slp5-stream-listing-media-prod/MLSGrid/190/22068876/photo/media/0_4261413115053874048.jpg&width=1000",
     latitude: 39.983606286476395,
     longitude: -85.98258444665584,
     coordinateVerified: true,
     amenities: { parks: true, trails: true, shopping: true, restaurants: false, communityEvents: false },
-    history: { daysOnMarket: 5, lastPriceChange: null, priceChanges: [], views: 0 },
-    listingDate: "2026-02-23",
+    history: { daysOnMarket: 45, lastPriceChange: "2026-04-01", priceChanges: [], views: 0 },
+    listingDate: "2026-02-27",
   },
   {
-    // Verified 4/2/2026: Active $619,900
+    // MLS 22082152 — Pending
     id: "prop_015",
     address: "10236 Bent Tree Ln",
     city: "Fishers",
@@ -243,7 +251,7 @@ export const ALL_PROPERTIES = [
     sqft: 4209,
     garage: 3,
     yearBuilt: 1995,
-    hoaAnnual: 552, // ≈46/mo primary HOA
+    hoaAnnual: 552, // ≈46/mo
     lotSize: 0.31,
     basement: "Finished",
     neighborhood: "Woods Edge At Windermere",
@@ -254,11 +262,14 @@ export const ALL_PROPERTIES = [
     walkScore: 13,
     bikeScore: 37,
     hasNeighborhoodPool: true,
-    zillowLink: "https://www.zillow.com/homedetails/10236-Bent-Tree-Ln-Fishers-IN-46037/73251899_zpid/",
+    zillowLink: "https://www.zillow.com/homedetails/10236-Bent-Tree-Ln-Fishers-IN-46037/73252130_zpid/",
     notes: "Holiday lights street home.",
     pros: [],
     cons: [],
-    priceHistory: [],
+    priceHistory: [
+      { date: "2026-02-12", price: 630900, event: "Listed" },
+      { date: "2026-03-13", oldPrice: 630900, newPrice: 619900 },
+    ],
     favorite: false,
     pricePerSqft: 147,
     imageUrl: "https://cdn.listingphotos.sierrastatic.com/pics3x/v1772489899/203/203_22082152_01.jpg",
@@ -266,15 +277,15 @@ export const ALL_PROPERTIES = [
     longitude: -85.98868479083804,
     coordinateVerified: false,
     amenities: { parks: true, trails: true, shopping: true, restaurants: false, communityEvents: true },
-    history: { daysOnMarket: 2, lastPriceChange: null, priceChanges: [], views: 0 },
-    listingDate: "2026-02-01",
+    history: { daysOnMarket: 24, lastPriceChange: "2026-03-13", priceChanges: [], views: 0 },
+    listingDate: "2026-02-12",
   },
   {
-    // Verified 4/2/2026: Active $510K (no price drop yet on portals)
+    // MLS 22087220 — Pending at 495K
     id: "prop_016",
     address: "12033 Flintstone Ct",
     city: "Fishers",
-    price: 510000,
+    price: 495000,
     beds: 5,
     baths: 3,
     sqft: 3382,
@@ -286,7 +297,7 @@ export const ALL_PROPERTIES = [
     neighborhood: "Sandstone Lakes",
     schools: "Hamilton Southeastern",
     commuteHusband: 35,
-    status: "Active",
+    status: "Pending",
     daysOnMarket: "Active",
     walkScore: 29,
     bikeScore: 59,
@@ -297,19 +308,21 @@ export const ALL_PROPERTIES = [
     cons: [],
     priceHistory: [
       { date: "2026-03-06", price: 510000, event: "Listed" },
+      { date: "2026-03-16", oldPrice: 510000, newPrice: 495000 },
+      { date: "2026-03-23", event: "Pending" },
     ],
     favorite: false,
-    pricePerSqft: 151, // 510000 / 3382 ≈ 151
+    pricePerSqft: 146, // 495000 / 3382 ≈ 146
     imageUrl: "https://photos.talktotucker.com/medium/mibor/22087220/12033-flint-stone-court-fishers-46037-ccb528d0-b8b7-4b83-ba0b-dfa5c931ccb8-0.jpeg",
     latitude: 39.96388970331086,
     longitude: -85.94847674665694,
     coordinateVerified: false,
     amenities: { parks: true, trails: true, shopping: true, restaurants: false, communityEvents: false },
-    history: { daysOnMarket: 1, lastPriceChange: "2026-03-06", priceChanges: [], views: 0 },
+    history: { daysOnMarket: 17, lastPriceChange: "2026-03-16", priceChanges: [], views: 0 },
     listingDate: "2026-03-06",
   },
   {
-    // Verified 4/2/2026: Active $499K — new listing 3/13/2026
+    // MLS 22088523 — Active (went Pending, now back Active)
     id: "prop_017",
     address: "9943 Deering St",
     city: "Fishers",
@@ -334,7 +347,11 @@ export const ALL_PROPERTIES = [
     notes: "Spyglass Hill home built in 1996.",
     pros: [],
     cons: [],
-    priceHistory: [],
+    priceHistory: [
+      { date: "2026-03-13", price: 499000, event: "Listed" },
+      { date: "2026-03-27", event: "Pending" },
+      { date: "2026-04-01", event: "Back to Active" },
+    ],
     favorite: false,
     pricePerSqft: 130,
     imageUrl: "https://ssl.cdn-redfin.com/photo/147/bigphoto/523/22088523_0.jpg",
@@ -342,11 +359,11 @@ export const ALL_PROPERTIES = [
     longitude: -85.99192700432972,
     coordinateVerified: false,
     amenities: { parks: true, trails: true, shopping: true, restaurants: false, communityEvents: false },
-    history: { daysOnMarket: 1, lastPriceChange: null, priceChanges: [], views: 0 },
+    history: { daysOnMarket: 19, lastPriceChange: "2026-04-01", priceChanges: [], views: 0 },
     listingDate: "2026-03-13",
   },
   {
-    // Verified 4/2/2026: Active $640K — new listing 3/13/2026 (Pending in MLS)
+    // MLS 22088967 — Pending
     id: "prop_018",
     address: "13374 Landwood Dr",
     city: "Fishers",
@@ -356,7 +373,7 @@ export const ALL_PROPERTIES = [
     sqft: 4276,
     garage: 3,
     yearBuilt: 2000,
-    hoaAnnual: 0, // TODO: replace with actual annual primary HOA; portals hide the exact number
+    hoaAnnual: 475, // per MLS/Compass
     lotSize: 0.28,
     basement: "Finished",
     neighborhood: "Links at Gray Eagle",
@@ -367,12 +384,13 @@ export const ALL_PROPERTIES = [
     walkScore: 12,
     bikeScore: 52,
     hasNeighborhoodPool: true,
-    zillowLink: "https://www.zillow.com/homedetails/13374-Landwood-Dr-Fishers-IN-46037/73250439_zpid/",
+    zillowLink: "https://www.zillow.com/homedetails/13374-Landwood-Dr-Fishers-IN-46038/349258174_zpid/",
     notes: "Gray Eagle golf community home.",
     pros: [],
     cons: [],
     priceHistory: [
       { date: "2026-03-13", price: 640000, event: "Listed" },
+      { date: "2026-03-16", event: "Pending" },
       { date: "2020-01-21", price: 387400, event: "Sold" },
     ],
     favorite: false,
@@ -382,11 +400,11 @@ export const ALL_PROPERTIES = [
     longitude: -85.92545233131347,
     coordinateVerified: false,
     amenities: { parks: true, trails: true, shopping: true, restaurants: false, communityEvents: true },
-    history: { daysOnMarket: 1, lastPriceChange: null, priceChanges: [], views: 0 },
+    history: { daysOnMarket: 3, lastPriceChange: "2026-03-16", priceChanges: [], views: 0 },
     listingDate: "2026-03-13",
   },
   {
-    // Verified 4/2/2026: Active $499,900 — new listing 3/9/2026
+    // MLS 22087886 — Pending
     id: "prop_019",
     address: "11008 Stratford Way",
     city: "Fishers",
@@ -402,7 +420,7 @@ export const ALL_PROPERTIES = [
     neighborhood: "Oxford Park",
     schools: "Hamilton Southeastern",
     commuteHusband: 32,
-    status: "Active",
+    status: "Pending",
     daysOnMarket: "Active",
     walkScore: 9,
     bikeScore: 54,
@@ -418,11 +436,11 @@ export const ALL_PROPERTIES = [
     latitude: 39.947588248037,
     longitude: -86.05841686200147,
     amenities: { parks: true, trails: true, shopping: false, restaurants: false, communityEvents: false },
-    history: { daysOnMarket: 9, lastPriceChange: null, priceChanges: [], views: 0 },
+    history: { daysOnMarket: 24, lastPriceChange: null, priceChanges: [], views: 0 },
     listingDate: "2026-03-09",
   },
   {
-    // Verified 4/2/2026: Active $580K (AI checker was wrong — NOT Sold)
+    // MLS 22089401 — Pending
     id: "prop_020",
     address: "10970 Andrews Pl",
     city: "Fishers",
@@ -438,7 +456,7 @@ export const ALL_PROPERTIES = [
     neighborhood: "Walnut Creek",
     schools: "Hamilton Southeastern",
     commuteHusband: 34,
-    status: "Active",
+    status: "Pending",
     daysOnMarket: "Active",
     walkScore: 12,
     bikeScore: 53,
@@ -447,18 +465,20 @@ export const ALL_PROPERTIES = [
     notes: "Corner lot in Walnut Creek with finished basement.",
     pros: [],
     cons: [],
-    priceHistory: [],
+    priceHistory: [
+      { date: "2026-03-19", price: 580000, event: "Listed" },
+    ],
     favorite: false,
     pricePerSqft: 134,
     imageUrl: "https://photos.talktotucker.com/medium/mibor/22089401/10970-andrews-place-fishers-46037-f55b4e71-b410-4df8-afd3-31606ac3fdd2-0.jpeg",
     latitude: 39.947017,
     longitude: -85.998194,
     amenities: { parks: true, trails: true, shopping: true, restaurants: true, communityEvents: false },
-    history: { daysOnMarket: 1, lastPriceChange: "", priceChanges: [], views: 0 },
-    listingDate: "2026-03-18",
+    history: { daysOnMarket: 2, lastPriceChange: "", priceChanges: [], views: 0 },
+    listingDate: "2026-03-19",
   },
   {
-    // Verified 4/2/2026: Confirmed Pending $650K
+    // MLS 22089911 — Pending
     id: "prop_021",
     address: "11750 Belle Plaine Blvd",
     city: "Fishers",
@@ -490,11 +510,11 @@ export const ALL_PROPERTIES = [
     latitude: 39.959441810293235,
     longitude: -85.9691714908367,
     amenities: { parks: true, trails: true, shopping: true, restaurants: true, communityEvents: true },
-    history: { daysOnMarket: 1, lastPriceChange: "", priceChanges: [], views: 0 },
-    listingDate: "2026-03-19",
+    history: { daysOnMarket: 14, lastPriceChange: "", priceChanges: [], views: 0 },
+    listingDate: "2026-03-18",
   },
   {
-    // Verified 4/2/2026: Active $575K
+    // MLS 22087784 — Pending
     id: "prop_022",
     address: "12992 Minden Dr",
     city: "Fishers",
@@ -510,7 +530,7 @@ export const ALL_PROPERTIES = [
     neighborhood: "Saxony",
     schools: "Hamilton Southeastern",
     commuteHusband: 33,
-    status: "Active",
+    status: "Pending",
     daysOnMarket: "New",
     walkScore: 27,
     bikeScore: 59,
@@ -519,18 +539,21 @@ export const ALL_PROPERTIES = [
     notes: "Walkable to community pool, 2 playgrounds, Witten Park, trails, Saxony Pizzeria & Boom Town Donuts. New staircase, carpet, appliances (March 2026), new roof (2020).",
     pros: [],
     cons: [],
-    priceHistory: [],
+    priceHistory: [
+      { date: "2026-03-20", price: 575000, event: "Listed" },
+      { date: "2026-03-25", event: "Pending" },
+    ],
     favorite: false,
     pricePerSqft: 132,
     imageUrl: "https://photos.talktotucker.com/medium/mibor/22087784/12992-minden-drive-fishers-46037-3d2001ae-1f75-4dce-a851-e64626860522-0.jpeg",
     latitude: 39.97947421767583,
     longitude: -85.92583729083555,
     amenities: { parks: true, trails: true, shopping: true, restaurants: true, communityEvents: true },
-    history: { daysOnMarket: 1, lastPriceChange: "", priceChanges: [], views: 0 },
-    listingDate: "2026-03-19",
+    history: { daysOnMarket: 5, lastPriceChange: "", priceChanges: [], views: 0 },
+    listingDate: "2026-03-20",
   },
   {
-    // Verified 4/2/2026: Active $535K
+    // MLS 22088607 — Pending (per your MLS view and broker feeds)
     id: "prop_023",
     address: "14211 Monarchy Ln",
     city: "Fishers",
@@ -546,7 +569,7 @@ export const ALL_PROPERTIES = [
     neighborhood: "Royalwood South",
     schools: "Hamilton Southeastern",
     commuteHusband: 31,
-    status: "Active",
+    status: "Pending",
     daysOnMarket: "New",
     walkScore: 44,
     bikeScore: 68,
@@ -555,18 +578,21 @@ export const ALL_PROPERTIES = [
     notes: "Backs to nature preserve with access to Geist-Greenway. Finished basement with 9-ft ceilings, rec room with bar, Murphy bed in guest room. Outdoor entertaining with pergola deck, stamped concrete patio, built-in gas firepit & grill.",
     pros: [],
     cons: [],
-    priceHistory: [],
+    priceHistory: [
+      { date: "2026-03-20", price: 535000, event: "Listed" },
+      { date: "2026-03-27", event: "Pending" },
+    ],
     favorite: false,
     pricePerSqft: 137,
     imageUrl: "https://images.remax.com/webapi-properties-mibor3/1f154c9422ded61447244cf10db9260dec536cc6-3-original.jpeg",
     latitude: 39.959724914832016,
     longitude: -85.91110298898539,
     amenities: { parks: true, trails: true, shopping: true, restaurants: true, communityEvents: false },
-    history: { daysOnMarket: 1, lastPriceChange: "", priceChanges: [], views: 0 },
+    history: { daysOnMarket: 7, lastPriceChange: "", priceChanges: [], views: 0 },
     listingDate: "2026-03-20",
   },
   {
-    // Verified 4/2/2026: Active $650K confirmed
+    // MLS 22087129 — Active
     id: "prop_024",
     address: "9767 Fortune Dr",
     city: "Fishers",
@@ -576,7 +602,7 @@ export const ALL_PROPERTIES = [
     sqft: 4340,
     garage: 3,
     yearBuilt: 1995,
-    hoaAnnual: 660, // ≈55/mo primary HOA
+    hoaAnnual: 660, // ≈55/mo
     lotSize: 0.42,
     basement: "Finished",
     neighborhood: "Walnut Creek",
@@ -603,3 +629,4 @@ export const ALL_PROPERTIES = [
     listingDate: "2026-03-04",
   },
 ];
+```
