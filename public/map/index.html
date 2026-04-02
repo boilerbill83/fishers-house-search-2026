@@ -221,6 +221,8 @@ function initMap() {
   // Build PROPERTIES from window.ALL_PROPERTIES (set by propertyData.js)
   PROPERTIES = (window.ALL_PROPERTIES || []).map(p => ({
     ...p,
+    lat: p.latitude,
+    lng: p.longitude,
     zillow: p.zillowLink,
   }));
 
