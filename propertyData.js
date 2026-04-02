@@ -629,4 +629,3 @@ export const ALL_PROPERTIES = [
     listingDate: "2026-03-04",
   },
 ];
-```
