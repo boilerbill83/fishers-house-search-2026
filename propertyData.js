@@ -103,7 +103,7 @@ export const ALL_PROPERTIES = [
     walkScore: 8,
     bikeScore: 55,
     hasNeighborhoodPool: false,
-    zillowLink: "https://www.zillow.com/homeddetails/10747-Red-Pine-Dr-Fishers-IN-46037/73228273_zpid/",
+    zillowLink: "https://www.zillow.com/homedetails/10747-Red-Pine-Dr-Fishers-IN-46037/73228273_zpid/",
     notes: "5 bedroom home with finished walkout basement. Near Windermere golf course.",
     pros: [],
     cons: [],
@@ -514,7 +514,7 @@ export const ALL_PROPERTIES = [
     listingDate: "2026-03-18",
   },
   {
-    // MLS 22087784 — Pending
+    // MLS 22087784 — Active
     id: "prop_022",
     address: "12992 Minden Dr",
     city: "Fishers",
@@ -530,7 +530,7 @@ export const ALL_PROPERTIES = [
     neighborhood: "Saxony",
     schools: "Hamilton Southeastern",
     commuteHusband: 33,
-    status: "Pending",
+    status: "Active",
     daysOnMarket: "New",
     walkScore: 27,
     bikeScore: 59,
@@ -541,7 +541,7 @@ export const ALL_PROPERTIES = [
     cons: [],
     priceHistory: [
       { date: "2026-03-20", price: 575000, event: "Listed" },
-      { date: "2026-03-25", event: "Pending" },
+      // pending event removed based on current Active status
     ],
     favorite: false,
     pricePerSqft: 132,
