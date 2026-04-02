@@ -105,26 +105,14 @@
   <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Your Home</div>
 </div>
 
-<script>
-// ── PROPERTY DATA ────────────────────────────────────────────────────────────
-const PROPERTIES = [
-  { id:"prop_004", address:"12880 Oxbridge Pl",       neighborhood:"Avalon of Fishers",        price:444900, beds:3, baths:2.5, sqft:3430, garage:2, status:"Active",  score:82, lat:39.97655, lng:-85.91615, zillow:"https://www.zillow.com/homedetails/12880-Oxbridge-Pl-Fishers-IN-46037/73219952_zpid/" },
-  { id:"prop_006", address:"10272 Whitetail Cir",     neighborhood:"Woods Edge At Windermere",  price:525000, beds:4, baths:2.5, sqft:2737, garage:2, status:"Active",  score:74, lat:39.93711, lng:-85.98645, zillow:"https://www.zillow.com/homedetails/10272-Whitetail-Cir-Fishers-IN-46037/73252526_zpid/" },
-  { id:"prop_009", address:"10747 Red Pine Dr",       neighborhood:"Pine Bluff Overlook",       price:500000, beds:5, baths:3.5, sqft:4323, garage:2, status:"Active",  score:78, lat:39.94267, lng:-85.99662, zillow:"https://www.zillow.com/homedetails/10747-Red-Pine-Dr-Fishers-IN-46037/73228273_zpid/" },
-  { id:"prop_010", address:"11987 Bird Key Blvd",     neighborhood:"Rolling Knoll",             price:600000, beds:4, baths:3.5, sqft:3618, garage:2, status:"Active",  score:80, lat:39.96291, lng:-85.96953, zillow:"https://www.zillow.com/homedetails/11987-Bird-Key-Blvd-Fishers-IN-46037/73249041_zpid/" },
-  { id:"prop_012", address:"12997 Bartlett Dr",       neighborhood:"Tanglewood",                price:474900, beds:5, baths:3,   sqft:4042, garage:3, status:"Pending", score:89, lat:39.98500, lng:-86.01250, zillow:"https://www.zillow.com/homedetails/12997-Bartlett-Dr-Fishers-IN-46037/99124508_zpid/" },
-  { id:"prop_014", address:"10480 Creektree Ln",      neighborhood:"Anderson Hall",             price:600000, beds:4, baths:3,   sqft:4217, garage:3, status:"Pending", score:72, lat:39.98361, lng:-85.98258, zillow:"https://www.zillow.com/homedetails/10480-Creektree-Ln-Fishers-IN-46038/73262874_zpid/" },
-  { id:"prop_015", address:"10236 Bent Tree Ln",      neighborhood:"Woods Edge At Windermere",  price:619900, beds:4, baths:2.5, sqft:4209, garage:3, status:"Active",  score:87, lat:39.93664, lng:-85.98868, zillow:"https://www.zillow.com/homedetails/10236-Bent-Tree-Ln-Fishers-IN-46037/73251899_zpid/" },
-  { id:"prop_016", address:"12033 Flintstone Ct",     neighborhood:"Sandstone Lakes",           price:495000, beds:5, baths:3,   sqft:3382, garage:2, status:"Active",  score:76, lat:39.96389, lng:-85.94848, zillow:"https://www.zillow.com/homedetails/12033-Flint-Stone-Ct-Fishers-IN-46037/73274763_zpid/" },
-  { id:"prop_017", address:"9943 Deering St",         neighborhood:"Spyglass Hill",             price:499000, beds:4, baths:2.5, sqft:3830, garage:2, status:"Active",  score:81, lat:39.94737, lng:-85.99193, zillow:"https://www.zillow.com/homedetails/9943-Deering-St-Fishers-IN-46037/73275377_zpid/" },
-  { id:"prop_018", address:"13374 Landwood Dr",       neighborhood:"Links at Gray Eagle",       price:640000, beds:4, baths:3.5, sqft:4276, garage:3, status:"Active",  score:83, lat:39.96223, lng:-85.92545, zillow:"https://www.zillow.com/homedetails/13374-Landwood-Dr-Fishers-IN-46037/73250439_zpid/" },
-  { id:"prop_019", address:"11008 Stratford Way",     neighborhood:"Oxford Park",               price:499900, beds:4, baths:2.5, sqft:3138, garage:2, status:"Active",  score:75, lat:39.94759, lng:-86.05842, zillow:"https://www.zillow.com/homedetails/11008-Stratford-Way-Fishers-IN-46038/73227768_zpid/" },
-  { id:"prop_020", address:"10970 Andrews Pl",        neighborhood:"Walnut Creek",              price:580000, beds:5, baths:4,   sqft:4316, garage:2, status:"Pending", score:79, lat:39.94702, lng:-85.99819, zillow:"https://www.zillow.com/homedetails/10970-Andrews-Pl-Fishers-IN-46037/73267537_zpid/" },
-  { id:"prop_021", address:"11750 Belle Plaine Blvd", neighborhood:"Rolling Knoll",             price:650000, beds:4, baths:4,   sqft:4136, garage:2, status:"Pending", score:77, lat:39.95944, lng:-85.96917, zillow:"https://www.zillow.com/homedetails/11750-Belle-Plaine-Blvd-Fishers-IN-46037/73249036_zpid/" },
-  { id:"prop_022", address:"12992 Minden Dr",         neighborhood:"Saxony",                    price:575000, beds:5, baths:4,   sqft:4346, garage:2, status:"Pending", score:84, lat:39.97947, lng:-85.92584, zillow:"https://www.zillow.com/homedetails/12992-Minden-Dr-Fishers-IN-46037/120230383_zpid/" },
-  { id:"prop_023", address:"14211 Monarchy Ln",       neighborhood:"Royalwood South",           price:535000, beds:4, baths:4,   sqft:3909, garage:3, status:"Pending", score:86, lat:39.95972, lng:-85.91110, zillow:"https://www.zillow.com/homedetails/14211-Monarchy-Ln-Fishers-IN-46038/73220549_zpid/" },
-  { id:"prop_024", address:"9767 Fortune Dr",         neighborhood:"Walnut Creek",              price:650000, beds:4, baths:3.5, sqft:4340, garage:3, status:"Active",  score:89, lat:39.94582, lng:-85.99642, zillow:"https://www.zillow.com/homedetails/9767-Fortune-Dr-Fishers-IN-46037/73259878_zpid/" },
-];
+<script type="module">
+// ── PROPERTY DATA (loaded from propertyData.js via ES module) ──────────────
+// propertyData.js is copied here by webpack at build time — always in sync
+import { ALL_PROPERTIES } from './propertyData.js';
+const PROPERTIES = ALL_PROPERTIES.map(p => ({
+  ...p,
+  zillow: p.zillowLink,  // map uses 'zillow', propertyData uses 'zillowLink'
+}));
 
 const YOUR_HOME = { address:"8038 Springwater Dr W", city:"Indianapolis, IN 46256", lat:39.93890, lng:-85.96270 };
 
@@ -138,40 +126,39 @@ function pinColor(status) {
   return                           { bg: '#94a3b8', border: '#64748b', text: '#fff' };
 }
 
-function makeSvgPin(status, score) {
+function makeSvgPin(status) {
   const c = pinColor(status);
   return {
     url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="44" height="54" viewBox="0 0 44 54">
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 36 48">
         <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
           <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.25"/>
         </filter>
-        <path filter="url(#shadow)" d="M22 2 C11 2 2 11 2 22 C2 36 22 52 22 52 C22 52 42 36 42 22 C42 11 33 2 22 2 Z"
+        <path filter="url(#shadow)" d="M18 2 C8 2 2 10 2 18 C2 30 18 46 18 46 C18 46 34 30 34 18 C34 10 28 2 18 2 Z"
           fill="${c.bg}" stroke="${c.border}" stroke-width="2"/>
-        <circle cx="22" cy="22" r="11" fill="white" opacity="0.25"/>
-        <text x="22" y="27" text-anchor="middle" font-family="system-ui,sans-serif"
-          font-size="11" font-weight="800" fill="${c.text}">${score}</text>
+        <circle cx="18" cy="18" r="6" fill="white" opacity="0.5"/>
       </svg>
     `)}`,
-    scaledSize: new google.maps.Size(44, 54),
-    anchor: new google.maps.Point(22, 52),
+    scaledSize: new google.maps.Size(36, 48),
+    anchor: new google.maps.Point(18, 46),
   };
 }
 
 function makeHomePinSvg() {
+  const c = { bg: '#3b82f6', border: '#1d4ed8' };
   return {
     url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="44" height="54" viewBox="0 0 44 54">
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 36 48">
         <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
           <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.25"/>
         </filter>
-        <path filter="url(#shadow)" d="M22 2 C11 2 2 11 2 22 C2 36 22 52 22 52 C22 52 42 36 42 22 C42 11 33 2 22 2 Z"
-          fill="#3b82f6" stroke="#1d4ed8" stroke-width="2"/>
-        <text x="22" y="28" text-anchor="middle" font-size="18" fill="white">🏠</text>
+        <path filter="url(#shadow)" d="M18 2 C8 2 2 10 2 18 C2 30 18 46 18 46 C18 46 34 30 34 18 C34 10 28 2 18 2 Z"
+          fill="${c.bg}" stroke="${c.border}" stroke-width="2"/>
+        <circle cx="18" cy="18" r="6" fill="white" opacity="0.5"/>
       </svg>
     `)}`,
-    scaledSize: new google.maps.Size(44, 54),
-    anchor: new google.maps.Point(22, 52),
+    scaledSize: new google.maps.Size(36, 48),
+    anchor: new google.maps.Point(18, 46),
   };
 }
 
@@ -186,11 +173,8 @@ function infoContent(p) {
 
   return `
     <div style="font-family:system-ui,sans-serif;padding:14px 16px;min-width:230px;max-width:270px">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
-        <div style="font-weight:700;font-size:14px;color:#1e293b;line-height:1.3;flex:1;margin-right:8px">${p.address}</div>
-        <div style="background:${p.score>=80?'#dcfce7':p.score>=60?'#fef9c3':'#fee2e2'};
-                    color:${p.score>=80?'#166534':p.score>=60?'#854d0e':'#991b1b'};
-                    font-weight:800;font-size:16px;padding:2px 8px;border-radius:8px;white-space:nowrap">${p.score}</div>
+      <div style="margin-bottom:6px">
+        <div style="font-weight:700;font-size:14px;color:#1e293b;line-height:1.3">${p.address}</div>
       </div>
       <div style="color:#64748b;font-size:12px;margin-bottom:8px">${p.neighborhood}</div>
       <div style="font-size:22px;font-weight:800;color:#2563eb;margin-bottom:6px">
@@ -262,7 +246,7 @@ function initMap() {
     const marker = new google.maps.Marker({
       position: pos,
       map,
-      icon: makeSvgPin(p.status, p.score),
+      icon: makeSvgPin(p.status),
       title: p.address,
       zIndex: p.status === 'Active' ? 10 : 5,
     });
@@ -287,7 +271,7 @@ function initMap() {
   homeMarker.addListener('click', () => {
     infoWindow.setContent(`
       <div style="font-family:system-ui,sans-serif;padding:12px 14px">
-        <div style="font-weight:700;font-size:13px;color:#1e293b;margin-bottom:4px">🏠 Your Current Home</div>
+        <div style="font-weight:700;font-size:13px;color:#1e293b;margin-bottom:4px">Your Current Home</div>
         <div style="color:#64748b;font-size:12px">${YOUR_HOME.address}</div>
         <div style="color:#64748b;font-size:12px">${YOUR_HOME.city}</div>
       </div>`);
