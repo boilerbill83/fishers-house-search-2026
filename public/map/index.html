@@ -125,21 +125,164 @@ function pinColor(status) {
   return                           { bg: '#94a3b8', border: '#64748b', text: '#fff' };
 }
 
-function makeSvgPin(status) {
+function makeSvgPin(status, price) {
   const c = pinColor(status);
+  const label = '
+
+
+
+// ── INFO WINDOW CONTENT ───────────────────────────────────────────────────────
+function infoContent(p) {
+  const c = pinColor(p.status);
+  const statusBadge = p.status === 'Active'
+    ? `<span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">● Active</span>`
+    : p.status === 'Pending'
+    ? `<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">● Pending</span>`
+    : `<span style="background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">● Sold</span>`;
+
+  return `
+    <div style="font-family:system-ui,sans-serif;padding:14px 16px;min-width:230px;max-width:270px">
+      <div style="margin-bottom:6px">
+        <div style="font-weight:700;font-size:14px;color:#1e293b;line-height:1.3">${p.address}</div>
+      </div>
+      <div style="color:#64748b;font-size:12px;margin-bottom:8px">${p.neighborhood}</div>
+      <div style="font-size:22px;font-weight:800;color:#2563eb;margin-bottom:6px">
+        $${Math.round(p.price/1000)}K
+        <span style="font-size:12px;color:#64748b;font-weight:500;margin-left:4px">$${Math.round(p.price/p.sqft)}/sqft</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:8px;background:#f8fafc;border-radius:8px;padding:6px">
+        <div style="text-align:center;font-size:11px"><div style="font-weight:700;color:#1e293b">${p.beds}</div><div style="color:#94a3b8">beds</div></div>
+        <div style="text-align:center;font-size:11px"><div style="font-weight:700;color:#1e293b">${p.baths}</div><div style="color:#94a3b8">baths</div></div>
+        <div style="text-align:center;font-size:11px"><div style="font-weight:700;color:#1e293b">${p.garage}</div><div style="color:#94a3b8">garage</div></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        ${statusBadge}
+        <a href="${p.zillow}" target="_blank"
+          style="background:#2563eb;color:white;padding:5px 12px;border-radius:8px;font-size:11px;font-weight:600;text-decoration:none">
+          View on Zillow ↗
+        </a>
+      </div>
+    </div>`;
+}
+
+// ── FILTER ────────────────────────────────────────────────────────────────────
+function setFilter(f) {
+  currentFilter = f;
+  document.getElementById('btn-all').className    = `filter-btn ${f==='all'    ? 'active-filter' : 'inactive-filter'}`;
+  document.getElementById('btn-active').className = `filter-btn ${f==='active' ? 'active-filter' : 'inactive-filter'}`;
+  markers.forEach(({ marker, property }) => {
+    const show = f === 'all' || property.status === 'Active';
+    marker.setVisible(show);
+  });
+  if (infoWindow) infoWindow.close();
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+function updateStats() {
+  document.getElementById('cnt-active').textContent  = PROPERTIES.filter(p => p.status === 'Active').length;
+  document.getElementById('cnt-pending').textContent = PROPERTIES.filter(p => p.status === 'Pending').length;
+  document.getElementById('cnt-sold').textContent    = PROPERTIES.filter(p => p.status === 'Sold').length;
+}
+
+// ── INIT MAP ──────────────────────────────────────────────────────────────────
+function initMap() {
+  // Build PROPERTIES from window.ALL_PROPERTIES (set by propertyData.js)
+  PROPERTIES = (window.ALL_PROPERTIES || []).map(p => ({
+    ...p,
+    lat: p.latitude,
+    lng: p.longitude,
+    zillow: p.zillowLink,
+  }));
+
+  if (PROPERTIES.length === 0) {
+    console.error('propertyData.js failed to load — window.ALL_PROPERTIES is empty');
+  }
+
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: { lat: 39.9600, lng: -85.9750 },
+    zoom: 12,
+    mapTypeId: 'roadmap',
+    mapTypeControl: true,
+    mapTypeControlOptions: {
+      style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+      position: google.maps.ControlPosition.TOP_RIGHT,
+    },
+    fullscreenControl: false,
+    streetViewControl: true,
+    zoomControl: true,
+    zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_CENTER },
+    styles: [
+      { featureType: "poi.business", stylers: [{ visibility: "off" }] },
+      { featureType: "poi.park", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+    ],
+  });
+
+  infoWindow = new google.maps.InfoWindow({ pixelOffset: new google.maps.Size(0, -8) });
+
+  const bounds = new google.maps.LatLngBounds();
+
+  // Plot properties
+  PROPERTIES.forEach(p => {
+    const pos = { lat: p.lat, lng: p.lng };
+    const marker = new google.maps.Marker({
+      position: pos,
+      map,
+      icon: makeSvgPin(p.status, p.price),
+      title: p.address,
+      zIndex: p.status === 'Active' ? 10 : 5,
+    });
+
+    marker.addListener('click', () => {
+      infoWindow.setContent(infoContent(p));
+      infoWindow.open(map, marker);
+    });
+
+    markers.push({ marker, property: p });
+    bounds.extend(pos);
+  });
+
+
+
+  // Fit map to all pins with padding
+  map.fitBounds(bounds, { top: 80, right: 40, bottom: 60, left: 40 });
+
+  updateStats();
+
+  // Close info window on map click
+  map.addListener('click', () => infoWindow.close());
+}
+</script>
+
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC5jgMY8Y8I2sDKeLZpbywj_a7IS-BOHC4&callback=initMap&v=weekly"
+  async defer>
+</script>
+
+</body>
+</html>
+ + Math.round(price / 1000) + 'K';
+  const pinW = 72, pinH = 48, tipH = 10;
   return {
     url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 36 48">
+      <svg xmlns="http://www.w3.org/2000/svg" width="${pinW}" height="${pinH + tipH}" viewBox="0 0 ${pinW} ${pinH + tipH}">
         <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.25"/>
+          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.3"/>
         </filter>
-        <path filter="url(#shadow)" d="M18 2 C8 2 2 10 2 18 C2 30 18 46 18 46 C18 46 34 30 34 18 C34 10 28 2 18 2 Z"
-          fill="${c.bg}" stroke="${c.border}" stroke-width="2"/>
-        <circle cx="18" cy="18" r="6" fill="white" opacity="0.5"/>
+        <g filter="url(#shadow)">
+          <rect x="2" y="2" width="${pinW-4}" height="${pinH-4}" rx="8" ry="8"
+            fill="${c.bg}" stroke="${c.border}" stroke-width="1.5"/>
+          <polygon points="${pinW/2-7},${pinH-2} ${pinW/2+7},${pinH-2} ${pinW/2},${pinH+tipH-1}"
+            fill="${c.bg}" stroke="${c.border}" stroke-width="1.5"/>
+          <polygon points="${pinW/2-6},${pinH-1} ${pinW/2+6},${pinH-1} ${pinW/2},${pinH+tipH-2}"
+            fill="${c.bg}"/>
+        </g>
+        <text x="${pinW/2}" y="${pinH/2 + 5}" text-anchor="middle"
+          font-family="system-ui,sans-serif" font-size="14" font-weight="800"
+          fill="white">${label}</text>
       </svg>
     `)}`,
-    scaledSize: new google.maps.Size(36, 48),
-    anchor: new google.maps.Point(18, 46),
+    scaledSize: new google.maps.Size(pinW, pinH + tipH),
+    anchor: new google.maps.Point(pinW / 2, pinH + tipH),
   };
 }
 
