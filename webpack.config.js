@@ -1,6 +1,17 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const CopyPlugin = require("copy-webpack-plugin");
+
+// Read propertyData.js and convert to a plain JS assignment for inline injection
+const fs = require("fs");
+const propertyDataRaw = fs.readFileSync(
+  path.resolve(__dirname, "propertyData.js"),
+  "utf8"
+);
+// Strip ES module export syntax → plain window variable
+const propertyDataInline = propertyDataRaw.replace(
+  /export\s+const\s+ALL_PROPERTIES\s*=/,
+  "window.ALL_PROPERTIES ="
+);
 
 module.exports = {
   entry: "./index.js",
@@ -29,24 +40,18 @@ module.exports = {
     ],
   },
   plugins: [
+    // Main React app
     new HtmlWebpackPlugin({
       template: "./public/index.html",
     }),
-    new CopyPlugin({
-      patterns: [
-        { from: "public/map", to: "map" },
-        {
-          from: "propertyData.js",
-          to: "map/propertyData.js",
-          transform(content) {
-            // Convert ES module export to global window variable
-            // so the standalone map HTML can load it as a plain <script>
-            return content
-              .toString()
-              .replace(/export\s+const\s+ALL_PROPERTIES/, "window.ALL_PROPERTIES");
-          },
-        },
-      ],
+    // Map app — injects property data inline at build time
+    new HtmlWebpackPlugin({
+      template: "./public/map/index.html",
+      filename: "map/index.html",
+      inject: false, // Don't inject bundle.js into the map page
+      templateParameters: {
+        propertyDataInline, // Passed to the template as <%= propertyDataInline %>
+      },
     }),
   ],
 };
