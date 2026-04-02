@@ -41,6 +41,7 @@ const HouseTrackerApp = () => {
   });
 
   const [statusFilter, setStatusFilter] = useState("all");
+  const [summaryStatusFilter, setSummaryStatusFilter] = useState("Active");
   const [summarySort, setSummarySort] = useState({ key: "score", direction: "desc" });
 
   React.useEffect(() => { localStorage.setItem("houseHuntFinancials", JSON.stringify(financials)); }, [financials]);
@@ -440,9 +441,19 @@ const HouseTrackerApp = () => {
       {showSummaryTable && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-7xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-            <div className="p-6 border-b flex justify-between items-start">
+            <div className="p-6 border-b flex justify-between items-center">
               <h3 className="text-2xl font-bold">Property Summary</h3>
-              <button onClick={() => setShowSummaryTable(false)} className="text-gray-400 hover:text-gray-600"><X size={24} /></button>
+              <div className="flex items-center gap-3">
+                <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+                  {["All", "Active", "Pending", "Sold"].map((s) => (
+                    <button key={s} onClick={() => setSummaryStatusFilter(s === "All" ? "all" : s)}
+                      className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${summaryStatusFilter === (s === "All" ? "all" : s) ? "bg-white shadow text-blue-600 font-semibold" : "text-gray-500 hover:text-gray-700"}`}>
+                      {s}
+                    </button>
+                  ))}
+                </div>
+                <button onClick={() => setShowSummaryTable(false)} className="text-gray-400 hover:text-gray-600"><X size={24} /></button>
+              </div>
             </div>
             <div className="flex-1 overflow-auto p-6">
               <table className="w-full border-collapse">
@@ -469,7 +480,7 @@ const HouseTrackerApp = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {summarySortedHouses.map((house, i) => {
+                  {summarySortedHouses.filter((h) => summaryStatusFilter === "all" || h.status === summaryStatusFilter).map((house, i) => {
                     const score = calculateNormalizedScore(house).total;
                     return (
                       <tr key={house.id} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>

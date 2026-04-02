@@ -585,7 +585,7 @@ export const ALL_PROPERTIES = [
     neighborhood: "Walnut Creek",
     schools: "Hamilton Southeastern",
     commuteHusband: 33,
-    status: "Active",
+    status: "Pending",
     daysOnMarket: "Active",
     walkScore: 5,
     bikeScore: 45,
