@@ -35,6 +35,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: "public/map", to: "map" },
+        { from: "propertyData.js", to: "map/propertyData.js" },
       ],
     }),
   ],
