@@ -210,7 +210,7 @@ const HouseTrackerApp = () => {
           ));
         }
 
-        await new Promise((res) => setTimeout(res, 8000));
+        await new Promise((res) => setTimeout(res, 15000));
       }
 
       setCurrentIndex(-1);
