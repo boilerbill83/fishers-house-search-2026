@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stoltenbergs House Hunt — Map</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body { font-family: system-ui, -apple-system, sans-serif; height: 100vh; overflow: hidden; }
+
+    #map { width: 100%; height: 100vh; }
+
+    /* Toolbar */
+    #toolbar {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: white;
+      border-radius: 12px;
+      padding: 10px 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+    }
+
+    #toolbar h1 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1e293b;
+      white-space: nowrap;
+      margin-right: 4px;
+    }
+
+    .divider { width: 1px; height: 24px; background: #e2e8f0; }
+
+    .filter-btn {
+      border: none;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-btn.active-filter { background: #2563eb; color: white; }
+    .filter-btn.inactive-filter { background: #f1f5f9; color: #475569; }
+    .filter-btn:hover { opacity: 0.85; }
+
+    /* Stats */
+    .stat { text-align: center; line-height: 1.2; }
+    .stat-num { font-size: 1.1rem; font-weight: 800; }
+    .stat-label { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-num.green { color: #16a34a; }
+    .stat-num.amber { color: #d97706; }
+    .stat-num.gray  { color: #94a3b8; }
+
+    /* Legend */
+    #legend {
+      position: absolute;
+      bottom: 32px;
+      left: 16px;
+      z-index: 10;
+      background: white;
+      border-radius: 10px;
+      padding: 10px 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+      font-size: 0.78rem;
+    }
+    #legend h3 { font-size: 0.72rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; color: #334155; font-weight: 500; }
+    .legend-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.15); flex-shrink: 0; }
+
+    /* Info window overrides */
+    .gm-style .gm-style-iw-c { border-radius: 12px !important; padding: 0 !important; max-width: 280px !important; }
+    .gm-style .gm-style-iw-d { overflow: hidden !important; }
+    .gm-style .gm-style-iw-t::after { display: none; }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- Toolbar -->
+<div id="toolbar">
+  <h1>🏡 House Hunt Map</h1>
+  <div class="divider"></div>
+  <div class="stat"><div class="stat-num green" id="cnt-active">0</div><div class="stat-label">Active</div></div>
+  <div class="stat"><div class="stat-num amber" id="cnt-pending">0</div><div class="stat-label">Pending</div></div>
+  <div class="stat"><div class="stat-num gray" id="cnt-sold">0</div><div class="stat-label">Sold</div></div>
+  <div class="divider"></div>
+  <button class="filter-btn active-filter" id="btn-all" onclick="setFilter('all')">Show All</button>
+  <button class="filter-btn inactive-filter" id="btn-active" onclick="setFilter('active')">Active Only</button>
+</div>
+
+<!-- Legend -->
+<div id="legend">
+  <h3>Legend</h3>
+  <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Active</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Pending</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#94a3b8"></div>Sold</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Your Home</div>
+</div>
+
+<script>
+// ── PROPERTY DATA ────────────────────────────────────────────────────────────
+const PROPERTIES = [
+  { id:"prop_004", address:"12880 Oxbridge Pl",       neighborhood:"Avalon of Fishers",        price:444900, beds:3, baths:2.5, sqft:3430, garage:2, status:"Active",  score:82, lat:39.97655, lng:-85.91615, zillow:"https://www.zillow.com/homedetails/12880-Oxbridge-Pl-Fishers-IN-46037/73219952_zpid/" },
+  { id:"prop_006", address:"10272 Whitetail Cir",     neighborhood:"Woods Edge At Windermere",  price:525000, beds:4, baths:2.5, sqft:2737, garage:2, status:"Active",  score:74, lat:39.93711, lng:-85.98645, zillow:"https://www.zillow.com/homedetails/10272-Whitetail-Cir-Fishers-IN-46037/73252526_zpid/" },
+  { id:"prop_009", address:"10747 Red Pine Dr",       neighborhood:"Pine Bluff Overlook",       price:500000, beds:5, baths:3.5, sqft:4323, garage:2, status:"Active",  score:78, lat:39.94267, lng:-85.99662, zillow:"https://www.zillow.com/homedetails/10747-Red-Pine-Dr-Fishers-IN-46037/73228273_zpid/" },
+  { id:"prop_010", address:"11987 Bird Key Blvd",     neighborhood:"Rolling Knoll",             price:600000, beds:4, baths:3.5, sqft:3618, garage:2, status:"Active",  score:80, lat:39.96291, lng:-85.96953, zillow:"https://www.zillow.com/homedetails/11987-Bird-Key-Blvd-Fishers-IN-46037/73249041_zpid/" },
+  { id:"prop_012", address:"12997 Bartlett Dr",       neighborhood:"Tanglewood",                price:474900, beds:5, baths:3,   sqft:4042, garage:3, status:"Pending", score:89, lat:39.98500, lng:-86.01250, zillow:"https://www.zillow.com/homedetails/12997-Bartlett-Dr-Fishers-IN-46037/99124508_zpid/" },
+  { id:"prop_014", address:"10480 Creektree Ln",      neighborhood:"Anderson Hall",             price:600000, beds:4, baths:3,   sqft:4217, garage:3, status:"Pending", score:72, lat:39.98361, lng:-85.98258, zillow:"https://www.zillow.com/homedetails/10480-Creektree-Ln-Fishers-IN-46038/73262874_zpid/" },
+  { id:"prop_015", address:"10236 Bent Tree Ln",      neighborhood:"Woods Edge At Windermere",  price:619900, beds:4, baths:2.5, sqft:4209, garage:3, status:"Active",  score:87, lat:39.93664, lng:-85.98868, zillow:"https://www.zillow.com/homedetails/10236-Bent-Tree-Ln-Fishers-IN-46037/73251899_zpid/" },
+  { id:"prop_016", address:"12033 Flintstone Ct",     neighborhood:"Sandstone Lakes",           price:495000, beds:5, baths:3,   sqft:3382, garage:2, status:"Active",  score:76, lat:39.96389, lng:-85.94848, zillow:"https://www.zillow.com/homedetails/12033-Flint-Stone-Ct-Fishers-IN-46037/73274763_zpid/" },
+  { id:"prop_017", address:"9943 Deering St",         neighborhood:"Spyglass Hill",             price:499000, beds:4, baths:2.5, sqft:3830, garage:2, status:"Active",  score:81, lat:39.94737, lng:-85.99193, zillow:"https://www.zillow.com/homedetails/9943-Deering-St-Fishers-IN-46037/73275377_zpid/" },
+  { id:"prop_018", address:"13374 Landwood Dr",       neighborhood:"Links at Gray Eagle",       price:640000, beds:4, baths:3.5, sqft:4276, garage:3, status:"Active",  score:83, lat:39.96223, lng:-85.92545, zillow:"https://www.zillow.com/homedetails/13374-Landwood-Dr-Fishers-IN-46037/73250439_zpid/" },
+  { id:"prop_019", address:"11008 Stratford Way",     neighborhood:"Oxford Park",               price:499900, beds:4, baths:2.5, sqft:3138, garage:2, status:"Active",  score:75, lat:39.94759, lng:-86.05842, zillow:"https://www.zillow.com/homedetails/11008-Stratford-Way-Fishers-IN-46038/73227768_zpid/" },
+  { id:"prop_020", address:"10970 Andrews Pl",        neighborhood:"Walnut Creek",              price:580000, beds:5, baths:4,   sqft:4316, garage:2, status:"Pending", score:79, lat:39.94702, lng:-85.99819, zillow:"https://www.zillow.com/homedetails/10970-Andrews-Pl-Fishers-IN-46037/73267537_zpid/" },
+  { id:"prop_021", address:"11750 Belle Plaine Blvd", neighborhood:"Rolling Knoll",             price:650000, beds:4, baths:4,   sqft:4136, garage:2, status:"Pending", score:77, lat:39.95944, lng:-85.96917, zillow:"https://www.zillow.com/homedetails/11750-Belle-Plaine-Blvd-Fishers-IN-46037/73249036_zpid/" },
+  { id:"prop_022", address:"12992 Minden Dr",         neighborhood:"Saxony",                    price:575000, beds:5, baths:4,   sqft:4346, garage:2, status:"Pending", score:84, lat:39.97947, lng:-85.92584, zillow:"https://www.zillow.com/homedetails/12992-Minden-Dr-Fishers-IN-46037/120230383_zpid/" },
+  { id:"prop_023", address:"14211 Monarchy Ln",       neighborhood:"Royalwood South",           price:535000, beds:4, baths:4,   sqft:3909, garage:3, status:"Pending", score:86, lat:39.95972, lng:-85.91110, zillow:"https://www.zillow.com/homedetails/14211-Monarchy-Ln-Fishers-IN-46038/73220549_zpid/" },
+  { id:"prop_024", address:"9767 Fortune Dr",         neighborhood:"Walnut Creek",              price:650000, beds:4, baths:3.5, sqft:4340, garage:3, status:"Active",  score:89, lat:39.94582, lng:-85.99642, zillow:"https://www.zillow.com/homedetails/9767-Fortune-Dr-Fishers-IN-46037/73259878_zpid/" },
+];
+
+const YOUR_HOME = { address:"8038 Springwater Dr W", city:"Indianapolis, IN 46256", lat:39.93890, lng:-85.96270 };
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let map, markers = [], infoWindow, currentFilter = 'all';
+
+// ── PIN COLORS ────────────────────────────────────────────────────────────────
+function pinColor(status) {
+  if (status === 'Active')  return { bg: '#22c55e', border: '#16a34a', text: '#fff' };
+  if (status === 'Pending') return { bg: '#f59e0b', border: '#d97706', text: '#fff' };
+  return                           { bg: '#94a3b8', border: '#64748b', text: '#fff' };
+}
+
+function makeSvgPin(status, score) {
+  const c = pinColor(status);
+  return {
+    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="44" height="54" viewBox="0 0 44 54">
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.25"/>
+        </filter>
+        <path filter="url(#shadow)" d="M22 2 C11 2 2 11 2 22 C2 36 22 52 22 52 C22 52 42 36 42 22 C42 11 33 2 22 2 Z"
+          fill="${c.bg}" stroke="${c.border}" stroke-width="2"/>
+        <circle cx="22" cy="22" r="11" fill="white" opacity="0.25"/>
+        <text x="22" y="27" text-anchor="middle" font-family="system-ui,sans-serif"
+          font-size="11" font-weight="800" fill="${c.text}">${score}</text>
+      </svg>
+    `)}`,
+    scaledSize: new google.maps.Size(44, 54),
+    anchor: new google.maps.Point(22, 52),
+  };
+}
+
+function makeHomePinSvg() {
+  return {
+    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="44" height="54" viewBox="0 0 44 54">
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.25"/>
+        </filter>
+        <path filter="url(#shadow)" d="M22 2 C11 2 2 11 2 22 C2 36 22 52 22 52 C22 52 42 36 42 22 C42 11 33 2 22 2 Z"
+          fill="#3b82f6" stroke="#1d4ed8" stroke-width="2"/>
+        <text x="22" y="28" text-anchor="middle" font-size="18" fill="white">🏠</text>
+      </svg>
+    `)}`,
+    scaledSize: new google.maps.Size(44, 54),
+    anchor: new google.maps.Point(22, 52),
+  };
+}
+
+// ── INFO WINDOW CONTENT ───────────────────────────────────────────────────────
+function infoContent(p) {
+  const c = pinColor(p.status);
+  const statusBadge = p.status === 'Active'
+    ? `<span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">● Active</span>`
+    : p.status === 'Pending'
+    ? `<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">● Pending</span>`
+    : `<span style="background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">● Sold</span>`;
+
+  return `
+    <div style="font-family:system-ui,sans-serif;padding:14px 16px;min-width:230px;max-width:270px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div style="font-weight:700;font-size:14px;color:#1e293b;line-height:1.3;flex:1;margin-right:8px">${p.address}</div>
+        <div style="background:${p.score>=80?'#dcfce7':p.score>=60?'#fef9c3':'#fee2e2'};
+                    color:${p.score>=80?'#166534':p.score>=60?'#854d0e':'#991b1b'};
+                    font-weight:800;font-size:16px;padding:2px 8px;border-radius:8px;white-space:nowrap">${p.score}</div>
+      </div>
+      <div style="color:#64748b;font-size:12px;margin-bottom:8px">${p.neighborhood}</div>
+      <div style="font-size:22px;font-weight:800;color:#2563eb;margin-bottom:6px">
+        $${Math.round(p.price/1000)}K
+        <span style="font-size:12px;color:#64748b;font-weight:500;margin-left:4px">$${Math.round(p.price/p.sqft)}/sqft</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:8px;background:#f8fafc;border-radius:8px;padding:6px">
+        <div style="text-align:center;font-size:11px"><div style="font-weight:700;color:#1e293b">${p.beds}</div><div style="color:#94a3b8">beds</div></div>
+        <div style="text-align:center;font-size:11px"><div style="font-weight:700;color:#1e293b">${p.baths}</div><div style="color:#94a3b8">baths</div></div>
+        <div style="text-align:center;font-size:11px"><div style="font-weight:700;color:#1e293b">${p.garage}</div><div style="color:#94a3b8">garage</div></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        ${statusBadge}
+        <a href="${p.zillow}" target="_blank"
+          style="background:#2563eb;color:white;padding:5px 12px;border-radius:8px;font-size:11px;font-weight:600;text-decoration:none">
+          View on Zillow ↗
+        </a>
+      </div>
+    </div>`;
+}
+
+// ── FILTER ────────────────────────────────────────────────────────────────────
+function setFilter(f) {
+  currentFilter = f;
+  document.getElementById('btn-all').className    = `filter-btn ${f==='all'    ? 'active-filter' : 'inactive-filter'}`;
+  document.getElementById('btn-active').className = `filter-btn ${f==='active' ? 'active-filter' : 'inactive-filter'}`;
+  markers.forEach(({ marker, property }) => {
+    const show = f === 'all' || property.status === 'Active';
+    marker.setVisible(show);
+  });
+  if (infoWindow) infoWindow.close();
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+function updateStats() {
+  document.getElementById('cnt-active').textContent  = PROPERTIES.filter(p => p.status === 'Active').length;
+  document.getElementById('cnt-pending').textContent = PROPERTIES.filter(p => p.status === 'Pending').length;
+  document.getElementById('cnt-sold').textContent    = PROPERTIES.filter(p => p.status === 'Sold').length;
+}
+
+// ── INIT MAP ──────────────────────────────────────────────────────────────────
+function initMap() {
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: { lat: 39.9600, lng: -85.9750 },
+    zoom: 12,
+    mapTypeId: 'roadmap',
+    mapTypeControl: true,
+    mapTypeControlOptions: {
+      style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+      position: google.maps.ControlPosition.TOP_RIGHT,
+    },
+    fullscreenControl: false,
+    streetViewControl: true,
+    zoomControl: true,
+    zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_CENTER },
+    styles: [
+      { featureType: "poi.business", stylers: [{ visibility: "off" }] },
+      { featureType: "poi.park", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+    ],
+  });
+
+  infoWindow = new google.maps.InfoWindow({ pixelOffset: new google.maps.Size(0, -8) });
+
+  const bounds = new google.maps.LatLngBounds();
+
+  // Plot properties
+  PROPERTIES.forEach(p => {
+    const pos = { lat: p.lat, lng: p.lng };
+    const marker = new google.maps.Marker({
+      position: pos,
+      map,
+      icon: makeSvgPin(p.status, p.score),
+      title: p.address,
+      zIndex: p.status === 'Active' ? 10 : 5,
+    });
+
+    marker.addListener('click', () => {
+      infoWindow.setContent(infoContent(p));
+      infoWindow.open(map, marker);
+    });
+
+    markers.push({ marker, property: p });
+    bounds.extend(pos);
+  });
+
+  // Your current home
+  const homeMarker = new google.maps.Marker({
+    position: { lat: YOUR_HOME.lat, lng: YOUR_HOME.lng },
+    map,
+    icon: makeHomePinSvg(),
+    title: 'Your Current Home',
+    zIndex: 20,
+  });
+  homeMarker.addListener('click', () => {
+    infoWindow.setContent(`
+      <div style="font-family:system-ui,sans-serif;padding:12px 14px">
+        <div style="font-weight:700;font-size:13px;color:#1e293b;margin-bottom:4px">🏠 Your Current Home</div>
+        <div style="color:#64748b;font-size:12px">${YOUR_HOME.address}</div>
+        <div style="color:#64748b;font-size:12px">${YOUR_HOME.city}</div>
+      </div>`);
+    infoWindow.open(map, homeMarker);
+  });
+  bounds.extend({ lat: YOUR_HOME.lat, lng: YOUR_HOME.lng });
+
+  // Fit map to all pins with padding
+  map.fitBounds(bounds, { top: 80, right: 40, bottom: 60, left: 40 });
+
+  updateStats();
+
+  // Close info window on map click
+  map.addListener('click', () => infoWindow.close());
+}
+</script>
+
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC5jgMY8Y8I2sDKeLZpbywj_a7IS-BOHC4&callback=initMap&v=weekly"
+  async defer>
+</script>
+
+</body>
+</html>
