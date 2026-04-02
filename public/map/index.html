@@ -6,51 +6,17 @@
   <title>Stoltenbergs House Hunt — Map</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     html, body { width: 100%; height: 100%; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; }
-
     #map { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-    /* Toolbar */
     #toolbar {
-      position: absolute;
-      top: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: white;
-      border-radius: 12px;
-      padding: 10px 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+      position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+      z-index: 10; display: flex; align-items: center; gap: 10px;
+      background: white; border-radius: 12px; padding: 10px 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.18); white-space: nowrap;
     }
-
-    #toolbar h1 {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: #1e293b;
-      white-space: nowrap;
-      margin-right: 4px;
-    }
-
+    #toolbar h1 { font-size: 0.95rem; font-weight: 700; color: #1e293b; margin-right: 4px; }
     .divider { width: 1px; height: 24px; background: #e2e8f0; }
-
-    .filter-btn {
-      border: none;
-      border-radius: 8px;
-      padding: 6px 14px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .filter-btn.active-filter { background: #2563eb; color: white; }
-    .filter-btn.inactive-filter { background: #f1f5f9; color: #475569; }
-    .filter-btn:hover { opacity: 0.85; }
-
-    /* Stats */
     .stat { text-align: center; line-height: 1.2; }
     .stat-num { font-size: 1.1rem; font-weight: 800; }
     .stat-label { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -58,68 +24,44 @@
     .stat-num.amber { color: #d97706; }
     .stat-num.gray  { color: #94a3b8; }
 
-    /* Legend */
+    .filter-btn {
+      border: none; border-radius: 8px; padding: 6px 14px;
+      font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.15s;
+    }
+    .filter-btn.active-filter { background: #2563eb; color: white; }
+    .filter-btn.inactive-filter { background: #f1f5f9; color: #475569; }
+    .filter-btn:hover { opacity: 0.85; }
+
+    #map-type-btns {
+      position: absolute; top: 16px; right: 16px; z-index: 10;
+      display: flex; gap: 4px; background: white; border-radius: 10px;
+      padding: 5px; box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+    .map-type-btn {
+      border: none; border-radius: 7px; padding: 6px 12px;
+      font-size: 0.78rem; font-weight: 600; cursor: pointer;
+      transition: all 0.15s; background: transparent; color: #475569;
+    }
+    .map-type-btn:hover { background: #f1f5f9; }
+    .map-type-btn.active-type { background: #2563eb; color: white; }
+
     #legend {
-      position: absolute;
-      bottom: 32px;
-      left: 16px;
-      z-index: 10;
-      background: white;
-      border-radius: 10px;
-      padding: 10px 14px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-      font-size: 0.78rem;
+      position: absolute; bottom: 32px; left: 16px; z-index: 10;
+      background: white; border-radius: 10px; padding: 10px 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15); font-size: 0.78rem;
     }
     #legend h3 { font-size: 0.72rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
     .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; color: #334155; font-weight: 500; }
     .legend-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.15); flex-shrink: 0; }
 
-    /* Map Type Buttons */
-    #map-type-btns {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      z-index: 10;
-      display: flex;
-      gap: 4px;
-      background: white;
-      border-radius: 10px;
-      padding: 5px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-    }
-    .map-type-btn {
-      border: none;
-      border-radius: 7px;
-      padding: 6px 12px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
-      background: transparent;
-      color: #475569;
-    }
-    .map-type-btn:hover { background: #f1f5f9; }
-    .map-type-btn.active-type { background: #2563eb; color: white; }
-
-    /* Info window overrides */
     .gm-style .gm-style-iw-c { border-radius: 12px !important; padding: 0 !important; max-width: 280px !important; }
     .gm-style .gm-style-iw-d { overflow: hidden !important; }
-    .gm-style .gm-style-iw-t::after { display: none; }
   </style>
 </head>
 <body>
 
 <div id="map"></div>
 
-<!-- Map Type Buttons -->
-<div id="map-type-btns">
-  <button class="map-type-btn active-type" id="btn-roadmap"  onclick="setMapType('roadmap')">Road</button>
-  <button class="map-type-btn" id="btn-satellite" onclick="setMapType('satellite')">Satellite</button>
-  <button class="map-type-btn" id="btn-hybrid"    onclick="setMapType('hybrid')">Hybrid</button>
-  <button class="map-type-btn" id="btn-terrain"   onclick="setMapType('terrain')">Terrain</button>
-</div>
-
-<!-- Toolbar -->
 <div id="toolbar">
   <h1>🏡 House Hunt Map</h1>
   <div class="divider"></div>
@@ -131,13 +73,18 @@
   <button class="filter-btn inactive-filter" id="btn-active" onclick="setFilter('active')">Active Only</button>
 </div>
 
-<!-- Legend -->
+<div id="map-type-btns">
+  <button class="map-type-btn active-type" id="btn-roadmap"   onclick="setMapType('roadmap')">Road</button>
+  <button class="map-type-btn"             id="btn-satellite" onclick="setMapType('satellite')">Satellite</button>
+  <button class="map-type-btn"             id="btn-hybrid"    onclick="setMapType('hybrid')">Hybrid</button>
+  <button class="map-type-btn"             id="btn-terrain"   onclick="setMapType('terrain')">Terrain</button>
+</div>
+
 <div id="legend">
   <h3>Legend</h3>
   <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Active</div>
   <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Pending</div>
   <div class="legend-item"><div class="legend-dot" style="background:#94a3b8"></div>Sold</div>
-  
 </div>
 
 <script>
@@ -145,102 +92,78 @@
 </script>
 
 <script>
-// ── PROPERTY DATA ────────────────────────────────────────────────────────────
-// window.ALL_PROPERTIES is set by propertyData.js loaded via <script> tag above
-// PROPERTIES is populated inside initMap to ensure the script has loaded
-let PROPERTIES = [];
+var map, markers = [], infoWindow, currentFilter = 'all';
+var PROPERTIES = [];
 
-// ── STATE ────────────────────────────────────────────────────────────────────
-let map, markers = [], infoWindow, currentFilter = 'all';
-
-// ── PIN COLORS ────────────────────────────────────────────────────────────────
 function pinColor(status) {
-  if (status === 'Active')  return { bg: '#22c55e', border: '#16a34a', text: '#fff' };
-  if (status === 'Pending') return { bg: '#f59e0b', border: '#d97706', text: '#fff' };
-  return                           { bg: '#94a3b8', border: '#64748b', text: '#fff' };
+  if (status === 'Active')  return { bg: '#22c55e', border: '#16a34a' };
+  if (status === 'Pending') return { bg: '#f59e0b', border: '#d97706' };
+  return { bg: '#94a3b8', border: '#64748b' };
 }
 
-function makeSvgPin(status, price) {
-  const c = pinColor(status);
-  const label = '
+function makePinIcon(status, price) {
+  var c = pinColor(status);
+  var label = '$' + Math.round(price / 1000) + 'K';
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="72" height="58" viewBox="0 0 72 58">'
+    + '<rect x="1" y="1" width="70" height="38" rx="8" ry="8" fill="' + c.bg + '" stroke="' + c.border + '" stroke-width="1.5"/>'
+    + '<polygon points="29,39 43,39 36,52" fill="' + c.bg + '" stroke="' + c.border + '" stroke-width="1.5"/>'
+    + '<polygon points="30,38 42,38 36,50" fill="' + c.bg + '"/>'
+    + '<text x="36" y="25" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" font-weight="800" fill="white">' + label + '</text>'
+    + '</svg>';
+  return {
+    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
+    scaledSize: new google.maps.Size(72, 58),
+    anchor: new google.maps.Point(36, 57),
+  };
+}
 
-
-
-// ── INFO WINDOW CONTENT ───────────────────────────────────────────────────────
 function infoContent(p) {
-  const c = pinColor(p.status);
-  const statusBadge = p.status === 'Active'
-    ? `<span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">● Active</span>`
+  var statusBadge = p.status === 'Active'
+    ? '<span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">&#9679; Active</span>'
     : p.status === 'Pending'
-    ? `<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">● Pending</span>`
-    : `<span style="background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">● Sold</span>`;
-
-  return `
-    <div style="font-family:system-ui,sans-serif;padding:14px 16px;min-width:230px;max-width:270px">
-      <div style="margin-bottom:6px">
-        <div style="font-weight:700;font-size:14px;color:#1e293b;line-height:1.3">${p.address}</div>
-      </div>
-      <div style="color:#64748b;font-size:12px;margin-bottom:8px">${p.neighborhood}</div>
-      <div style="font-size:22px;font-weight:800;color:#2563eb;margin-bottom:6px">
-        $${Math.round(p.price/1000)}K
-        <span style="font-size:12px;color:#64748b;font-weight:500;margin-left:4px">$${Math.round(p.price/p.sqft)}/sqft</span>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:8px;background:#f8fafc;border-radius:8px;padding:6px">
-        <div style="text-align:center;font-size:11px"><div style="font-weight:700;color:#1e293b">${p.beds}</div><div style="color:#94a3b8">beds</div></div>
-        <div style="text-align:center;font-size:11px"><div style="font-weight:700;color:#1e293b">${p.baths}</div><div style="color:#94a3b8">baths</div></div>
-        <div style="text-align:center;font-size:11px"><div style="font-weight:700;color:#1e293b">${p.garage}</div><div style="color:#94a3b8">garage</div></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        ${statusBadge}
-        <a href="${p.zillow}" target="_blank"
-          style="background:#2563eb;color:white;padding:5px 12px;border-radius:8px;font-size:11px;font-weight:600;text-decoration:none">
-          View on Zillow ↗
-        </a>
-      </div>
-    </div>`;
+    ? '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">&#9679; Pending</span>'
+    : '<span style="background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">&#9679; Sold</span>';
+  return '<div style="font-family:system-ui,sans-serif;padding:14px 16px;min-width:230px;max-width:270px">'
+    + '<div style="font-weight:700;font-size:14px;color:#1e293b;margin-bottom:4px">' + p.address + '</div>'
+    + '<div style="color:#64748b;font-size:12px;margin-bottom:8px">' + p.neighborhood + '</div>'
+    + '<div style="font-size:22px;font-weight:800;color:#2563eb;margin-bottom:6px">$' + Math.round(p.price/1000) + 'K'
+    + '<span style="font-size:12px;color:#64748b;font-weight:500;margin-left:4px">$' + Math.round(p.price/p.sqft) + '/sqft</span></div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:8px;background:#f8fafc;border-radius:8px;padding:6px">'
+    + '<div style="text-align:center;font-size:11px"><div style="font-weight:700;color:#1e293b">' + p.beds + '</div><div style="color:#94a3b8">beds</div></div>'
+    + '<div style="text-align:center;font-size:11px"><div style="font-weight:700;color:#1e293b">' + p.baths + '</div><div style="color:#94a3b8">baths</div></div>'
+    + '<div style="text-align:center;font-size:11px"><div style="font-weight:700;color:#1e293b">' + p.garage + '</div><div style="color:#94a3b8">garage</div></div>'
+    + '</div>'
+    + '<div style="display:flex;justify-content:space-between;align-items:center">'
+    + statusBadge
+    + '<a href="' + p.zillowLink + '" target="_blank" style="background:#2563eb;color:white;padding:5px 12px;border-radius:8px;font-size:11px;font-weight:600;text-decoration:none">View on Zillow &#8599;</a>'
+    + '</div></div>';
 }
 
-// ── FILTER ────────────────────────────────────────────────────────────────────
 function setFilter(f) {
   currentFilter = f;
-  document.getElementById('btn-all').className    = `filter-btn ${f==='all'    ? 'active-filter' : 'inactive-filter'}`;
-  document.getElementById('btn-active').className = `filter-btn ${f==='active' ? 'active-filter' : 'inactive-filter'}`;
-  markers.forEach(({ marker, property }) => {
-    const show = f === 'all' || property.status === 'Active';
-    marker.setVisible(show);
+  document.getElementById('btn-all').className    = 'filter-btn ' + (f === 'all'    ? 'active-filter' : 'inactive-filter');
+  document.getElementById('btn-active').className = 'filter-btn ' + (f === 'active' ? 'active-filter' : 'inactive-filter');
+  markers.forEach(function(m) {
+    m.marker.setVisible(f === 'all' || m.property.status === 'Active');
   });
   if (infoWindow) infoWindow.close();
 }
 
-// ── STATS ─────────────────────────────────────────────────────────────────────
-function updateStats() {
-  document.getElementById('cnt-active').textContent  = PROPERTIES.filter(p => p.status === 'Active').length;
-  document.getElementById('cnt-pending').textContent = PROPERTIES.filter(p => p.status === 'Pending').length;
-  document.getElementById('cnt-sold').textContent    = PROPERTIES.filter(p => p.status === 'Sold').length;
-}
-
-// ── MAP TYPE ─────────────────────────────────────────────────────────────────
 function setMapType(type) {
   map.setMapTypeId(type);
-  ['roadmap','satellite','hybrid','terrain'].forEach(t => {
-    document.getElementById('btn-' + t).className =
-      'map-type-btn' + (t === type ? ' active-type' : '');
+  ['roadmap','satellite','hybrid','terrain'].forEach(function(t) {
+    document.getElementById('btn-' + t).className = 'map-type-btn' + (t === type ? ' active-type' : '');
   });
 }
 
-// ── INIT MAP ──────────────────────────────────────────────────────────────────
-function initMap() {
-  // Build PROPERTIES from window.ALL_PROPERTIES (set by propertyData.js)
-  PROPERTIES = (window.ALL_PROPERTIES || []).map(p => ({
-    ...p,
-    lat: p.latitude,
-    lng: p.longitude,
-    zillow: p.zillowLink,
-  }));
+function updateStats() {
+  document.getElementById('cnt-active').textContent  = PROPERTIES.filter(function(p){ return p.status === 'Active'; }).length;
+  document.getElementById('cnt-pending').textContent = PROPERTIES.filter(function(p){ return p.status === 'Pending'; }).length;
+  document.getElementById('cnt-sold').textContent    = PROPERTIES.filter(function(p){ return p.status === 'Sold'; }).length;
+}
 
-  if (PROPERTIES.length === 0) {
-    console.error('propertyData.js failed to load — window.ALL_PROPERTIES is empty');
-  }
+function initMap() {
+  PROPERTIES = (window.ALL_PROPERTIES || []);
 
   map = new google.maps.Map(document.getElementById('map'), {
     center: { lat: 39.9600, lng: -85.9750 },
@@ -253,207 +176,37 @@ function initMap() {
     zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_CENTER },
     styles: [
       { featureType: "poi.business", stylers: [{ visibility: "off" }] },
-      { featureType: "poi.park", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
     ],
   });
 
-  infoWindow = new google.maps.InfoWindow({ pixelOffset: new google.maps.Size(0, -8) });
+  infoWindow = new google.maps.InfoWindow({ pixelOffset: new google.maps.Size(0, -4) });
 
-  const bounds = new google.maps.LatLngBounds();
+  var bounds = new google.maps.LatLngBounds();
 
-  // Plot properties
-  PROPERTIES.forEach(p => {
-    const pos = { lat: p.lat, lng: p.lng };
-    const marker = new google.maps.Marker({
+  PROPERTIES.forEach(function(p) {
+    var pos = { lat: p.latitude, lng: p.longitude };
+    var marker = new google.maps.Marker({
       position: pos,
-      map,
-      icon: makeSvgPin(p.status, p.price),
+      map: map,
+      icon: makePinIcon(p.status, p.price),
       title: p.address,
       zIndex: p.status === 'Active' ? 10 : 5,
     });
-
-    marker.addListener('click', () => {
+    marker.addListener('click', function() {
       infoWindow.setContent(infoContent(p));
       infoWindow.open(map, marker);
     });
-
-    markers.push({ marker, property: p });
+    markers.push({ marker: marker, property: p });
     bounds.extend(pos);
   });
 
-
-
-  // Fit map to all pins with padding
-  map.fitBounds(bounds, { top: 80, right: 40, bottom: 60, left: 40 });
-
+  map.fitBounds(bounds, { top: 80, right: 60, bottom: 60, left: 40 });
   updateStats();
-
-  // Close info window on map click
-  map.addListener('click', () => infoWindow.close());
+  map.addListener('click', function() { infoWindow.close(); });
 }
 </script>
 
-<script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC5jgMY8Y8I2sDKeLZpbywj_a7IS-BOHC4&callback=initMap&v=weekly"
-  async defer>
-</script>
-
-</body>
-</html>
- + Math.round(price / 1000) + 'K';
-  const pinW = 72, pinH = 48, tipH = 10;
-  return {
-    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="${pinW}" height="${pinH + tipH}" viewBox="0 0 ${pinW} ${pinH + tipH}">
-        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.3"/>
-        </filter>
-        <g filter="url(#shadow)">
-          <rect x="2" y="2" width="${pinW-4}" height="${pinH-4}" rx="8" ry="8"
-            fill="${c.bg}" stroke="${c.border}" stroke-width="1.5"/>
-          <polygon points="${pinW/2-7},${pinH-2} ${pinW/2+7},${pinH-2} ${pinW/2},${pinH+tipH-1}"
-            fill="${c.bg}" stroke="${c.border}" stroke-width="1.5"/>
-          <polygon points="${pinW/2-6},${pinH-1} ${pinW/2+6},${pinH-1} ${pinW/2},${pinH+tipH-2}"
-            fill="${c.bg}"/>
-        </g>
-        <text x="${pinW/2}" y="${pinH/2 + 5}" text-anchor="middle"
-          font-family="system-ui,sans-serif" font-size="14" font-weight="800"
-          fill="white">${label}</text>
-      </svg>
-    `)}`,
-    scaledSize: new google.maps.Size(pinW, pinH + tipH),
-    anchor: new google.maps.Point(pinW / 2, pinH + tipH),
-  };
-}
-
-
-
-// ── INFO WINDOW CONTENT ───────────────────────────────────────────────────────
-function infoContent(p) {
-  const c = pinColor(p.status);
-  const statusBadge = p.status === 'Active'
-    ? `<span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">● Active</span>`
-    : p.status === 'Pending'
-    ? `<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">● Pending</span>`
-    : `<span style="background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">● Sold</span>`;
-
-  return `
-    <div style="font-family:system-ui,sans-serif;padding:14px 16px;min-width:230px;max-width:270px">
-      <div style="margin-bottom:6px">
-        <div style="font-weight:700;font-size:14px;color:#1e293b;line-height:1.3">${p.address}</div>
-      </div>
-      <div style="color:#64748b;font-size:12px;margin-bottom:8px">${p.neighborhood}</div>
-      <div style="font-size:22px;font-weight:800;color:#2563eb;margin-bottom:6px">
-        $${Math.round(p.price/1000)}K
-        <span style="font-size:12px;color:#64748b;font-weight:500;margin-left:4px">$${Math.round(p.price/p.sqft)}/sqft</span>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:8px;background:#f8fafc;border-radius:8px;padding:6px">
-        <div style="text-align:center;font-size:11px"><div style="font-weight:700;color:#1e293b">${p.beds}</div><div style="color:#94a3b8">beds</div></div>
-        <div style="text-align:center;font-size:11px"><div style="font-weight:700;color:#1e293b">${p.baths}</div><div style="color:#94a3b8">baths</div></div>
-        <div style="text-align:center;font-size:11px"><div style="font-weight:700;color:#1e293b">${p.garage}</div><div style="color:#94a3b8">garage</div></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        ${statusBadge}
-        <a href="${p.zillow}" target="_blank"
-          style="background:#2563eb;color:white;padding:5px 12px;border-radius:8px;font-size:11px;font-weight:600;text-decoration:none">
-          View on Zillow ↗
-        </a>
-      </div>
-    </div>`;
-}
-
-// ── FILTER ────────────────────────────────────────────────────────────────────
-function setFilter(f) {
-  currentFilter = f;
-  document.getElementById('btn-all').className    = `filter-btn ${f==='all'    ? 'active-filter' : 'inactive-filter'}`;
-  document.getElementById('btn-active').className = `filter-btn ${f==='active' ? 'active-filter' : 'inactive-filter'}`;
-  markers.forEach(({ marker, property }) => {
-    const show = f === 'all' || property.status === 'Active';
-    marker.setVisible(show);
-  });
-  if (infoWindow) infoWindow.close();
-}
-
-// ── STATS ─────────────────────────────────────────────────────────────────────
-function updateStats() {
-  document.getElementById('cnt-active').textContent  = PROPERTIES.filter(p => p.status === 'Active').length;
-  document.getElementById('cnt-pending').textContent = PROPERTIES.filter(p => p.status === 'Pending').length;
-  document.getElementById('cnt-sold').textContent    = PROPERTIES.filter(p => p.status === 'Sold').length;
-}
-
-// ── INIT MAP ──────────────────────────────────────────────────────────────────
-function initMap() {
-  // Build PROPERTIES from window.ALL_PROPERTIES (set by propertyData.js)
-  PROPERTIES = (window.ALL_PROPERTIES || []).map(p => ({
-    ...p,
-    lat: p.latitude,
-    lng: p.longitude,
-    zillow: p.zillowLink,
-  }));
-
-  if (PROPERTIES.length === 0) {
-    console.error('propertyData.js failed to load — window.ALL_PROPERTIES is empty');
-  }
-
-  map = new google.maps.Map(document.getElementById('map'), {
-    center: { lat: 39.9600, lng: -85.9750 },
-    zoom: 12,
-    mapTypeId: 'roadmap',
-    mapTypeControl: true,
-    mapTypeControlOptions: {
-      style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-      position: google.maps.ControlPosition.TOP_RIGHT,
-    },
-    fullscreenControl: false,
-    streetViewControl: true,
-    zoomControl: true,
-    zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_CENTER },
-    styles: [
-      { featureType: "poi.business", stylers: [{ visibility: "off" }] },
-      { featureType: "poi.park", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
-    ],
-  });
-
-  infoWindow = new google.maps.InfoWindow({ pixelOffset: new google.maps.Size(0, -8) });
-
-  const bounds = new google.maps.LatLngBounds();
-
-  // Plot properties
-  PROPERTIES.forEach(p => {
-    const pos = { lat: p.lat, lng: p.lng };
-    const marker = new google.maps.Marker({
-      position: pos,
-      map,
-      icon: makeSvgPin(p.status),
-      title: p.address,
-      zIndex: p.status === 'Active' ? 10 : 5,
-    });
-
-    marker.addListener('click', () => {
-      infoWindow.setContent(infoContent(p));
-      infoWindow.open(map, marker);
-    });
-
-    markers.push({ marker, property: p });
-    bounds.extend(pos);
-  });
-
-
-
-  // Fit map to all pins with padding
-  map.fitBounds(bounds, { top: 80, right: 40, bottom: 60, left: 40 });
-
-  updateStats();
-
-  // Close info window on map click
-  map.addListener('click', () => infoWindow.close());
-}
-</script>
-
-<script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC5jgMY8Y8I2sDKeLZpbywj_a7IS-BOHC4&callback=initMap&v=weekly"
-  async defer>
-</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC5jgMY8Y8I2sDKeLZpbywj_a7IS-BOHC4&callback=initMap&v=weekly" async defer></script>
 
 </body>
 </html>
