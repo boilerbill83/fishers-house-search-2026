@@ -5,18 +5,12 @@ import {
   Bath,
   Square,
   Car,
-  MapPin,
   X,
   Calculator,
   ExternalLink,
   Target,
   Sliders,
   Download,
-  RefreshCw,
-  CheckCircle,
-  AlertTriangle,
-  HelpCircle,
-  Clock,
 } from "lucide-react";
 import { ALL_PROPERTIES } from "./propertyData";
 
@@ -25,7 +19,6 @@ const HouseTrackerApp = () => {
   const [showScoringPreferences, setShowScoringPreferences] = useState(false);
   const [showFinancials, setShowFinancials] = useState(false);
   const [showSummaryTable, setShowSummaryTable] = useState(false);
-  const [showStatusChecker, setShowStatusChecker] = useState(false);
 
   const [financials, setFinancials] = useState(() => {
     const saved = localStorage.getItem("houseHuntFinancials");
@@ -223,265 +216,6 @@ const HouseTrackerApp = () => {
     return { active, pending, sold, total: houses.length };
   }, [houses]);
 
-  // ─── STATUS CHECKER ────────────────────────────────────────────────────────
-
-  const StatusCheckerModal = () => {
-    const [results, setResults] = useState([]);
-    const [running, setRunning] = useState(false);
-    const [currentIndex, setCurrentIndex] = useState(-1);
-    const [done, setDone] = useState(false);
-
-    const checkAllStatuses = async () => {
-      setResults([]);
-      setRunning(true);
-      setDone(false);
-      const newResults = [];
-
-      for (let i = 0; i < houses.length; i++) {
-        const house = houses[i];
-        setCurrentIndex(i);
-
-        // Initialize entry as "checking"
-        const entry = {
-          id: house.id,
-          address: house.address,
-          recordedStatus: house.status,
-          detectedStatus: null,
-          confidence: null,
-          reasoning: null,
-          state: "checking",
-        };
-        setResults((prev) => [...prev, entry]);
-
-        try {
-          const prompt = `You are a real estate listing status checker. I need you to determine the CURRENT listing status of a specific property.
-
-Property details:
-- Address: ${house.address}, ${house.city || "Fishers"}, IN
-- Recorded status in my tracker: ${house.status}
-- Listing URL: ${house.zillowLink}
-- Neighborhood: ${house.neighborhood}
-- Price: $${house.price?.toLocaleString()}
-- Beds/Baths: ${house.beds}bd / ${house.baths}ba
-- Sqft: ${house.sqft?.toLocaleString()}
-
-Please search the web for the current listing status of this property. Check the listing URL if possible, or search Zillow, Redfin, Realtor.com, or other sources for "${house.address} Fishers IN ${house.price}".
-
-Respond ONLY with a JSON object in this exact format (no markdown, no extra text):
-{
-  "detectedStatus": "Active" | "Pending" | "Sold" | "Unknown",
-  "confidence": "High" | "Medium" | "Low",
-  "reasoning": "brief explanation of what you found and where"
-}`;
-
-          const response = await fetch("https://api.anthropic.com/v1/messages", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              model: "claude-sonnet-4-20250514",
-              max_tokens: 1000,
-              tools: [{ type: "web_search_20250305", name: "web_search" }],
-              messages: [{ role: "user", content: prompt }],
-            }),
-          });
-
-          const data = await response.json();
-
-          // Extract the final text response (after any tool use)
-          const textBlocks = data.content?.filter((b) => b.type === "text") || [];
-          const rawText = textBlocks.map((b) => b.text).join("\n");
-
-          let parsed = null;
-          try {
-            const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-              parsed = JSON.parse(jsonMatch[0]);
-            }
-          } catch (e) {
-            // parse failed
-          }
-
-          const detectedStatus = parsed?.detectedStatus || "Unknown";
-          const confidence = parsed?.confidence || "Low";
-          const reasoning = parsed?.reasoning || rawText.slice(0, 200);
-          const changed = detectedStatus !== "Unknown" && detectedStatus !== house.status;
-
-          setResults((prev) =>
-            prev.map((r) =>
-              r.id === house.id
-                ? { ...r, detectedStatus, confidence, reasoning, state: changed ? "changed" : "confirmed" }
-                : r
-            )
-          );
-        } catch (err) {
-          setResults((prev) =>
-            prev.map((r) =>
-              r.id === house.id
-                ? { ...r, detectedStatus: "Error", confidence: "Low", reasoning: err.message, state: "error" }
-                : r
-            )
-          );
-        }
-
-        // Small delay between requests
-        await new Promise((res) => setTimeout(res, 800));
-      }
-
-      setCurrentIndex(-1);
-      setRunning(false);
-      setDone(true);
-    };
-
-    const getStateIcon = (state) => {
-      if (state === "checking") return <Clock size={18} className="text-blue-500 animate-spin" />;
-      if (state === "confirmed") return <CheckCircle size={18} className="text-green-500" />;
-      if (state === "changed") return <AlertTriangle size={18} className="text-amber-500" />;
-      if (state === "error") return <HelpCircle size={18} className="text-red-400" />;
-      return null;
-    };
-
-    const getStateBg = (state) => {
-      if (state === "checking") return "bg-blue-50 border-blue-200";
-      if (state === "confirmed") return "bg-green-50 border-green-200";
-      if (state === "changed") return "bg-amber-50 border-amber-300";
-      if (state === "error") return "bg-red-50 border-red-200";
-      return "bg-gray-50 border-gray-200";
-    };
-
-    const statusColor = (s) => {
-      if (s === "Active") return "text-green-700 bg-green-100";
-      if (s === "Pending") return "text-red-700 bg-red-100";
-      if (s === "Sold") return "text-gray-600 bg-gray-200";
-      return "text-gray-500 bg-gray-100";
-    };
-
-    const changed = results.filter((r) => r.state === "changed");
-    const confirmed = results.filter((r) => r.state === "confirmed");
-    const errors = results.filter((r) => r.state === "error");
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
-          {/* Header */}
-          <div className="p-5 border-b flex justify-between items-center bg-gradient-to-r from-indigo-600 to-blue-600 rounded-t-xl">
-            <div className="flex items-center gap-3 text-white">
-              <RefreshCw size={22} className={running ? "animate-spin" : ""} />
-              <div>
-                <h3 className="text-xl font-bold">Status Checker</h3>
-                <p className="text-blue-100 text-sm">Verifies each listing against live web data</p>
-              </div>
-            </div>
-            <button onClick={() => setShowStatusChecker(false)} className="text-white hover:text-blue-200">
-              <X size={24} />
-            </button>
-          </div>
-
-          {/* Summary bar — shown once done */}
-          {done && (
-            <div className="px-5 py-3 border-b bg-gray-50 flex gap-6 text-sm font-medium">
-              <span className="text-green-700">✓ {confirmed.length} confirmed</span>
-              <span className="text-amber-600">⚠ {changed.length} status changed</span>
-              {errors.length > 0 && <span className="text-red-500">✗ {errors.length} errors</span>}
-            </div>
-          )}
-
-          {/* Start button */}
-          {!running && results.length === 0 && (
-            <div className="flex-1 flex flex-col items-center justify-center gap-4 p-10 text-center">
-              <div className="text-gray-400 text-5xl">🔍</div>
-              <p className="text-gray-600 max-w-sm">
-                This will check all <strong>{houses.length} properties</strong> one by one using live web search to verify their current listing status.
-              </p>
-              <p className="text-gray-400 text-sm">Takes about {Math.ceil(houses.length * 1.5)} – {houses.length * 3} seconds</p>
-              <button
-                onClick={checkAllStatuses}
-                className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg flex items-center gap-2 transition-all"
-              >
-                <RefreshCw size={18} />
-                Start Status Check
-              </button>
-            </div>
-          )}
-
-          {/* Progress + results list */}
-          {results.length > 0 && (
-            <div className="flex-1 overflow-y-auto p-4 space-y-2">
-              {/* Progress indicator while running */}
-              {running && (
-                <div className="mb-3">
-                  <div className="flex justify-between text-sm text-gray-500 mb-1">
-                    <span>Checking {currentIndex + 1} of {houses.length}…</span>
-                    <span>{Math.round(((currentIndex + 1) / houses.length) * 100)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-indigo-500 h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${((currentIndex + 1) / houses.length) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {results.map((r) => (
-                <div key={r.id} className={`border rounded-lg p-3 flex gap-3 items-start transition-all ${getStateBg(r.state)}`}>
-                  <div className="mt-0.5 flex-shrink-0">{getStateIcon(r.state)}</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-gray-800 text-sm">{r.address}</span>
-                      {/* Recorded status */}
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor(r.recordedStatus)}`}>
-                        Was: {r.recordedStatus}
-                      </span>
-                      {/* Detected status */}
-                      {r.detectedStatus && r.state !== "checking" && (
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${statusColor(r.detectedStatus)}`}>
-                          Now: {r.detectedStatus}
-                        </span>
-                      )}
-                      {r.confidence && r.state !== "checking" && (
-                        <span className="text-xs text-gray-400">({r.confidence} confidence)</span>
-                      )}
-                    </div>
-                    {r.reasoning && r.state !== "checking" && (
-                      <p className="text-xs text-gray-500 mt-1 leading-snug">{r.reasoning}</p>
-                    )}
-                    {r.state === "checking" && (
-                      <p className="text-xs text-blue-400 mt-0.5">Searching…</p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Footer */}
-          {done && changed.length > 0 && (
-            <div className="p-4 border-t bg-amber-50 rounded-b-xl">
-              <p className="text-sm text-amber-800 font-medium">
-                ⚠️ {changed.length} propert{changed.length === 1 ? "y has" : "ies have"} a different status than recorded. Update <code className="bg-amber-100 px-1 rounded">propertyData.js</code> accordingly.
-              </p>
-              <ul className="mt-2 space-y-1">
-                {changed.map((r) => (
-                  <li key={r.id} className="text-xs text-amber-700">
-                    • <strong>{r.address}</strong>: {r.recordedStatus} → <strong>{r.detectedStatus}</strong>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {done && changed.length === 0 && !errors.length && (
-            <div className="p-4 border-t bg-green-50 rounded-b-xl text-center">
-              <p className="text-sm text-green-700 font-medium">✅ All statuses confirmed — your tracker is up to date!</p>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  // ─── HOUSE CARD ────────────────────────────────────────────────────────────
-
   const HouseCard = ({ house }) => {
     const score = calculateNormalizedScore(house);
 
@@ -609,8 +343,6 @@ Respond ONLY with a JSON object in this exact format (no markdown, no extra text
     );
   };
 
-  // ─── SCORING PREFERENCES MODAL ─────────────────────────────────────────────
-
   const ScoringPreferencesModal = () => {
     const labels = {
       price: "Purchase Price",
@@ -686,8 +418,6 @@ Respond ONLY with a JSON object in this exact format (no markdown, no extra text
     );
   };
 
-  // ─── MAIN RENDER ───────────────────────────────────────────────────────────
-
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 rounded-lg shadow-lg p-8 mb-6 text-white">
@@ -711,9 +441,6 @@ Respond ONLY with a JSON object in this exact format (no markdown, no extra text
             </button>
             <button onClick={() => setShowSummaryTable(true)} className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg text-sm">
               <Download size={16} />Summary
-            </button>
-            <button onClick={() => setShowStatusChecker(true)} className="bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-600 hover:to-cyan-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg text-sm">
-              <RefreshCw size={16} />Check Status
             </button>
           </div>
 
@@ -740,7 +467,6 @@ Respond ONLY with a JSON object in this exact format (no markdown, no extra text
       </div>
 
       {showScoringPreferences && <ScoringPreferencesModal />}
-      {showStatusChecker && <StatusCheckerModal />}
 
       {showFinancials && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
