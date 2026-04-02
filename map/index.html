@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Stoltenbergs House Hunt — Map</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Stoltenbergs House Hunt — Map</title><style>* { margin: 0; padding: 0; box-sizing: border-box; }
 
     body { font-family: system-ui, -apple-system, sans-serif; height: 100vh; overflow: hidden; }
 
@@ -77,38 +70,7 @@
     /* Info window overrides */
     .gm-style .gm-style-iw-c { border-radius: 12px !important; padding: 0 !important; max-width: 280px !important; }
     .gm-style .gm-style-iw-d { overflow: hidden !important; }
-    .gm-style .gm-style-iw-t::after { display: none; }
-  </style>
-</head>
-<body>
-
-<div id="map"></div>
-
-<!-- Toolbar -->
-<div id="toolbar">
-  <h1>🏡 House Hunt Map</h1>
-  <div class="divider"></div>
-  <div class="stat"><div class="stat-num green" id="cnt-active">0</div><div class="stat-label">Active</div></div>
-  <div class="stat"><div class="stat-num amber" id="cnt-pending">0</div><div class="stat-label">Pending</div></div>
-  <div class="stat"><div class="stat-num gray" id="cnt-sold">0</div><div class="stat-label">Sold</div></div>
-  <div class="divider"></div>
-  <button class="filter-btn active-filter" id="btn-all" onclick="setFilter('all')">Show All</button>
-  <button class="filter-btn inactive-filter" id="btn-active" onclick="setFilter('active')">Active Only</button>
-</div>
-
-<!-- Legend -->
-<div id="legend">
-  <h3>Legend</h3>
-  <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Active</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Pending</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#94a3b8"></div>Sold</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Your Home</div>
-</div>
-
-<script src="propertyData.js"></script>
-
-<script>
-// ── PROPERTY DATA ────────────────────────────────────────────────────────────
+    .gm-style .gm-style-iw-t::after { display: none; }</style></head><body><div id="map"></div><div id="toolbar"><h1>🏡 House Hunt Map</h1><div class="divider"></div><div class="stat"><div class="stat-num green" id="cnt-active">0</div><div class="stat-label">Active</div></div><div class="stat"><div class="stat-num amber" id="cnt-pending">0</div><div class="stat-label">Pending</div></div><div class="stat"><div class="stat-num gray" id="cnt-sold">0</div><div class="stat-label">Sold</div></div><div class="divider"></div><button class="filter-btn active-filter" id="btn-all" onclick="setFilter('all')">Show All</button> <button class="filter-btn inactive-filter" id="btn-active" onclick="setFilter('active')">Active Only</button></div><div id="legend"><h3>Legend</h3><div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Active</div><div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Pending</div><div class="legend-item"><div class="legend-dot" style="background:#94a3b8"></div>Sold</div><div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Your Home</div></div><script src="propertyData.js"></script><script>// ── PROPERTY DATA ────────────────────────────────────────────────────────────
 // window.ALL_PROPERTIES is set by propertyData.js loaded via <script> tag above
 // PROPERTIES is populated inside initMap to ensure the script has loaded
 let PROPERTIES = [];
@@ -295,13 +257,4 @@ function initMap() {
 
   // Close info window on map click
   map.addListener('click', () => infoWindow.close());
-}
-</script>
-
-<script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC5jgMY8Y8I2sDKeLZpbywj_a7IS-BOHC4&callback=initMap&v=weekly"
-  async defer>
-</script>
-
-</body>
-</html>
+}</script><script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC5jgMY8Y8I2sDKeLZpbywj_a7IS-BOHC4&callback=initMap&v=weekly" async defer="defer"></script></body></html>
