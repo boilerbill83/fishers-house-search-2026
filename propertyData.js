@@ -34,8 +34,7 @@ export const ALL_PROPERTIES = [
       "https://photos.zillowstatic.com/fp/fa5b10bf7e4e0e4faf2b98f0263609da-cc_ft_1152.webp",
     latitude: 39.97655133863871,
     longitude: -85.91614624665627,
-    coordinateVerified: false, // TODO: Verify via Google Maps
-    coordinateVerified: false, // Needs Google Maps verification
+    coordinateVerified: false,
     amenities: {
       parks: true,
       trails: true,
@@ -86,7 +85,6 @@ export const ALL_PROPERTIES = [
     latitude: 39.93710973008341,
     longitude: -85.98644956200211,
     coordinateVerified: false,
-    coordinateVerified: false, // Needs Google Maps verification
     amenities: {
       parks: true,
       trails: true,
@@ -104,10 +102,11 @@ export const ALL_PROPERTIES = [
   },
 
   {
+    // prop_009: status Pending→Active, price 475000→500000
     id: "prop_009",
     address: "10747 Red Pine Dr",
     city: "Fishers",
-    price: 475000,
+    price: 500000,
     beds: 5,
     baths: 3.5,
     sqft: 4323,
@@ -119,7 +118,7 @@ export const ALL_PROPERTIES = [
     neighborhood: "Pine Bluff Overlook",
     schools: "Hamilton Southeastern",
     commuteHusband: 38,
-    status: "Pending",
+    status: "Active",
     daysOnMarket: "Active",
     walkScore: 15,
     bikeScore: 47,
@@ -130,15 +129,14 @@ export const ALL_PROPERTIES = [
       "5 bedroom home with finished basement. Near Windermere golf course.",
     pros: [],
     cons: [],
-    priceHistory: [],
+    priceHistory: [{ date: "2026-04-02", oldPrice: 475000, newPrice: 500000 }],
     favorite: false,
-    pricePerSqft: 110,
+    pricePerSqft: 116,
     imageUrl:
       "https://photos.zillowstatic.com/fp/025cf54831f2bcfc22eca5aac5dda275-cc_ft_1152.webp",
     latitude: 39.94267103088205,
     longitude: -85.99661627734538,
     coordinateVerified: false,
-    coordinateVerified: false, // Needs Google Maps verification
     amenities: {
       parks: true,
       trails: true,
@@ -148,7 +146,7 @@ export const ALL_PROPERTIES = [
     },
     history: {
       daysOnMarket: 37,
-      lastPriceChange: null,
+      lastPriceChange: "2026-04-02",
       priceChanges: [],
       views: 0,
     },
@@ -156,10 +154,11 @@ export const ALL_PROPERTIES = [
   },
 
   {
+    // prop_010: price 578000→600000
     id: "prop_010",
     address: "11987 Bird Key Blvd",
     city: "Fishers",
-    price: 578000,
+    price: 600000,
     beds: 4,
     baths: 3.5,
     sqft: 3618,
@@ -181,15 +180,14 @@ export const ALL_PROPERTIES = [
     notes: "Brick home with finished basement.",
     pros: [],
     cons: [],
-    priceHistory: [],
+    priceHistory: [{ date: "2026-04-02", oldPrice: 578000, newPrice: 600000 }],
     favorite: false,
-    pricePerSqft: 161,
+    pricePerSqft: 166,
     imageUrl:
       "https://ssl.cdn-redfin.com/photo/147/bigphoto/902/22082902_0.jpg",
     latitude: 39.96291071302564,
     longitude: -85.969532246657,
     coordinateVerified: false,
-    coordinateVerified: false, // Needs Google Maps verification
     amenities: {
       parks: true,
       trails: true,
@@ -199,7 +197,7 @@ export const ALL_PROPERTIES = [
     },
     history: {
       daysOnMarket: 52,
-      lastPriceChange: null,
+      lastPriceChange: "2026-04-02",
       priceChanges: [],
       views: 0,
     },
@@ -207,10 +205,11 @@ export const ALL_PROPERTIES = [
   },
 
   {
+    // prop_012: price 474900→479900
     id: "prop_012",
     address: "12997 Bartlett Dr",
     city: "Fishers",
-    price: 474900,
+    price: 479900,
     beds: 5,
     baths: 3,
     sqft: 4042,
@@ -232,7 +231,10 @@ export const ALL_PROPERTIES = [
     notes: "Large 5BR home in Tanglewood.",
     pros: [],
     cons: [],
-    priceHistory: [{ date: "2025-10-15", price: 479900, event: "Listed" }],
+    priceHistory: [
+      { date: "2025-10-15", price: 479900, event: "Listed" },
+      { date: "2026-04-02", oldPrice: 474900, newPrice: 479900 },
+    ],
     favorite: false,
     pricePerSqft: 119,
     imageUrl:
@@ -248,7 +250,7 @@ export const ALL_PROPERTIES = [
     },
     history: {
       daysOnMarket: 156,
-      lastPriceChange: null,
+      lastPriceChange: "2026-04-02",
       priceChanges: [],
       views: 1069,
     },
@@ -288,8 +290,7 @@ export const ALL_PROPERTIES = [
       "https://cflare.smarteragent.com/rest/Resizer?sig_id=69&quality=0.8&url=https://storage.googleapis.com/slp5-stream-listing-media-prod/MLSGrid/190/22068876/photo/media/0_4261413115053874048.jpg&width=1000",
     latitude: 39.983606286476395,
     longitude: -85.98258444665584,
-    coordinateVerified: true, // Verified via whereorg.com + MLS data on 2026-03-19
-    coordinateVerified: true, // ✅ Verified from whereorg.com + MLS data (March 19, 2026)
+    coordinateVerified: true,
     amenities: {
       parks: true,
       trails: true,
@@ -340,7 +341,6 @@ export const ALL_PROPERTIES = [
     latitude: 39.936641852261445,
     longitude: -85.98868479083804,
     coordinateVerified: false,
-    coordinateVerified: false, // Needs Google Maps verification
     amenities: {
       parks: true,
       trails: true,
@@ -358,10 +358,11 @@ export const ALL_PROPERTIES = [
   },
 
   {
+    // prop_016: price 510000→495000
     id: "prop_016",
     address: "12033 Flintstone Ct",
     city: "Fishers",
-    price: 510000,
+    price: 495000,
     beds: 5,
     baths: 3,
     sqft: 3382,
@@ -383,15 +384,14 @@ export const ALL_PROPERTIES = [
     notes: "Move-in ready Sandstone Lakes home.",
     pros: [],
     cons: [],
-    priceHistory: [],
+    priceHistory: [{ date: "2026-04-02", oldPrice: 510000, newPrice: 495000 }],
     favorite: false,
-    pricePerSqft: 151,
+    pricePerSqft: 146,
     imageUrl:
       "https://photos.talktotucker.com/medium/mibor/22087220/12033-flint-stone-court-fishers-46037-ccb528d0-b8b7-4b83-ba0b-dfa5c931ccb8-0.jpeg",
     latitude: 39.96388970331086,
     longitude: -85.94847674665694,
     coordinateVerified: false,
-    coordinateVerified: false, // Needs Google Maps verification
     amenities: {
       parks: true,
       trails: true,
@@ -401,7 +401,7 @@ export const ALL_PROPERTIES = [
     },
     history: {
       daysOnMarket: 1,
-      lastPriceChange: null,
+      lastPriceChange: "2026-04-02",
       priceChanges: [],
       views: 0,
     },
@@ -409,6 +409,7 @@ export const ALL_PROPERTIES = [
   },
 
   {
+    // prop_017: status Pending→Active
     id: "prop_017",
     address: "9943 Deering St",
     city: "Fishers",
@@ -424,7 +425,7 @@ export const ALL_PROPERTIES = [
     neighborhood: "Spyglass Hill",
     schools: "Hamilton Southeastern",
     commuteHusband: 33,
-    status: "Pending",
+    status: "Active",
     daysOnMarket: "Active",
     walkScore: 15,
     bikeScore: 57,
@@ -442,7 +443,6 @@ export const ALL_PROPERTIES = [
     latitude: 39.94736887365393,
     longitude: -85.99192700432972,
     coordinateVerified: false,
-    coordinateVerified: false, // Needs Google Maps verification
     amenities: {
       parks: true,
       trails: true,
@@ -460,6 +460,7 @@ export const ALL_PROPERTIES = [
   },
 
   {
+    // prop_018: status Pending→Active
     id: "prop_018",
     address: "13374 Landwood Dr",
     city: "Fishers",
@@ -475,7 +476,7 @@ export const ALL_PROPERTIES = [
     neighborhood: "Links at Gray Eagle",
     schools: "Hamilton Southeastern",
     commuteHusband: 36,
-    status: "Pending",
+    status: "Active",
     daysOnMarket: "Active",
     walkScore: 12,
     bikeScore: 52,
@@ -496,7 +497,6 @@ export const ALL_PROPERTIES = [
     latitude: 39.96223066123813,
     longitude: -85.92545233131347,
     coordinateVerified: false,
-    coordinateVerified: false, // Needs Google Maps verification
     amenities: {
       parks: true,
       trails: true,
@@ -528,7 +528,7 @@ export const ALL_PROPERTIES = [
     basement: "Finished",
     neighborhood: "Oxford Park",
     schools: "Hamilton Southeastern",
-    commuteHusband: 32, // Manual verification recommended
+    commuteHusband: 32,
     status: "Pending",
     daysOnMarket: "Active",
     walkScore: 9,
@@ -562,11 +562,13 @@ export const ALL_PROPERTIES = [
     },
     listingDate: "2026-03-09",
   },
+
   {
+    // prop_020: status Pending→Sold, price 580000→555000
     id: "prop_020",
     address: "10970 Andrews Pl",
     city: "Fishers",
-    price: 580000,
+    price: 555000,
     beds: 5,
     baths: 4,
     sqft: 4316,
@@ -578,7 +580,7 @@ export const ALL_PROPERTIES = [
     neighborhood: "Walnut Creek",
     schools: "Hamilton Southeastern",
     commuteHusband: 34,
-    status: "Pending",
+    status: "Sold",
     daysOnMarket: "Active",
     walkScore: 12,
     bikeScore: 53,
@@ -588,9 +590,9 @@ export const ALL_PROPERTIES = [
     notes: "Corner lot in Walnut Creek with finished basement.",
     pros: [],
     cons: [],
-    priceHistory: [],
+    priceHistory: [{ date: "2026-04-02", oldPrice: 580000, newPrice: 555000 }],
     favorite: false,
-    pricePerSqft: 134,
+    pricePerSqft: 129,
     imageUrl:
       "https://photos.talktotucker.com/medium/mibor/22089401/10970-andrews-place-fishers-46037-f55b4e71-b410-4df8-afd3-31606ac3fdd2-0.jpeg",
     latitude: 39.947017,
@@ -604,12 +606,13 @@ export const ALL_PROPERTIES = [
     },
     history: {
       daysOnMarket: 1,
-      lastPriceChange: "",
+      lastPriceChange: "2026-04-02",
       priceChanges: [],
       views: 0,
     },
     listingDate: "2026-03-18",
   },
+
   {
     id: "prop_021",
     address: "11750 Belle Plaine Blvd",
@@ -658,6 +661,7 @@ export const ALL_PROPERTIES = [
     },
     listingDate: "2026-03-19",
   },
+
   {
     id: "prop_022",
     address: "12992 Minden Dr",
@@ -707,6 +711,7 @@ export const ALL_PROPERTIES = [
     },
     listingDate: "2026-03-19",
   },
+
   {
     id: "prop_023",
     address: "14211 Monarchy Ln",
@@ -756,6 +761,7 @@ export const ALL_PROPERTIES = [
     },
     listingDate: "2026-03-20",
   },
+
   {
     id: "prop_024",
     address: "9767 Fortune Dr",
@@ -766,12 +772,12 @@ export const ALL_PROPERTIES = [
     sqft: 4340,
     garage: 3,
     yearBuilt: 1995,
-    hoaAnnual: 300, // Based on other Walnut Creek properties
+    hoaAnnual: 300,
     lotSize: 0.42,
-    basement: "Finished", // Typical for Walnut Creek custom homes
+    basement: "Finished",
     neighborhood: "Walnut Creek",
     schools: "Hamilton Southeastern",
-    commuteHusband: 33, // Estimated based on Cumberland Rd access
+    commuteHusband: 33,
     status: "Active",
     daysOnMarket: "Active",
     walkScore: 5,
@@ -798,7 +804,7 @@ export const ALL_PROPERTIES = [
       communityEvents: false,
     },
     history: {
-      daysOnMarket: 24, // Listed Mar 4, 2026 (24 days ago as of Mar 28)
+      daysOnMarket: 24,
       lastPriceChange: "",
       priceChanges: [],
       views: 0,
