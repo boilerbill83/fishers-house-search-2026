@@ -1,5 +1,5 @@
 // propertyData.js
-// Last verified: April 2, 2026 via manual web + MLS mirror search
+// Last verified: April 4, 2026
 
 export const ALL_PROPERTIES = [
   {
@@ -605,11 +605,11 @@ export const ALL_PROPERTIES = [
     history: { daysOnMarket: 24, lastPriceChange: "", priceChanges: [], views: 0 },
     listingDate: "2026-03-04",
   },
-{
+  {
     id: "prop_025",
     address: "13867 Cold Spring Dr",
     city: "Fishers",
-    price: 650000,
+    price: 519900,
     beds: 4,
     baths: 4,
     sqft: 4310,
@@ -632,15 +632,16 @@ export const ALL_PROPERTIES = [
     cons: [],
     priceHistory: [
       { date: "2026-04-02", price: 650000, event: "Listed" },
+      { date: "2026-04-04", oldPrice: 650000, newPrice: 519900 },
     ],
     favorite: false,
-    pricePerSqft: 151,
+    pricePerSqft: 121,
     imageUrl: "https://photos.zillowstatic.com/fp/030398cc4d89611c8017fca5752f6de0-cc_ft_1152.webp",
     latitude: 39.991398525055345,
     longitude: -85.97223098650771,
     coordinateVerified: true,
     amenities: { parks: true, trails: true, shopping: true, restaurants: true, communityEvents: true },
-    history: { daysOnMarket: 1, lastPriceChange: "", priceChanges: [], views: 0 },
+    history: { daysOnMarket: 1, lastPriceChange: "2026-04-04", priceChanges: [], views: 0 },
     listingDate: "2026-04-02",
   },
 ];
