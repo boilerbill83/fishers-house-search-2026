@@ -248,7 +248,7 @@ export const ALL_PROPERTIES = [
     neighborhood: "Woods Edge At Windermere",
     schools: "Hamilton Southeastern",
     commuteHusband: 38,
-    status: "Pending",
+    status: "Active",
     daysOnMarket: "Active",
     walkScore: 13,
     bikeScore: 37,
