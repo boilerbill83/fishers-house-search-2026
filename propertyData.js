@@ -703,7 +703,7 @@ export const ALL_PROPERTIES = [
     pros: [],
     cons: [],
     priceHistory: [{ date: "2026-04-09", price: 495000, event: "Listed" }],
-    favorite: false,
+    favorite: true,
     pricePerSqft: 130,
     imageUrl: "https://photos.zillowstatic.com/fp/8c77d6400e447c66b0bd1f5aee4fcd9c-cc_ft_1152.webp",
     latitude: 39.92790234401471,

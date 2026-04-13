@@ -104,7 +104,6 @@
 <script>
 var map, markers = [], infoWindow, currentFilter = 'active';
 var PROPERTIES = [];
-var favorites = JSON.parse(localStorage.getItem('houseFavorites') || '[]');
 
 function pinColor(status) {
   if (status === 'Active')  return { bg: '#22c55e', border: '#16a34a' };
@@ -136,7 +135,7 @@ function makePinIcon(status, price, isFavorite) {
 }
 
 function infoContent(p) {
-  var isFav = favorites.indexOf(p.id) !== -1;
+  var isFav = p.favorite === true;
   var statusBadge = p.status === 'Active'
     ? '<span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">&#9679; Active</span>'
     : p.status === 'Pending'
@@ -174,7 +173,7 @@ function setFilter(f) {
   markers.forEach(function(m) {
     var visible = f === 'all'
       || (f === 'active' && m.property.status === 'Active')
-      || (f === 'favorites' && favorites.indexOf(m.property.id) !== -1);
+      || (f === 'favorites' && m.property.favorite === true);
     m.marker.setVisible(visible);
   });
   if (infoWindow) infoWindow.close();
@@ -191,7 +190,7 @@ function updateStats() {
   document.getElementById('cnt-active').textContent    = PROPERTIES.filter(function(p){ return p.status === 'Active'; }).length;
   document.getElementById('cnt-pending').textContent   = PROPERTIES.filter(function(p){ return p.status === 'Pending'; }).length;
   document.getElementById('cnt-sold').textContent      = PROPERTIES.filter(function(p){ return p.status === 'Sold'; }).length;
-  document.getElementById('cnt-favorites').textContent = favorites.filter(function(id){ return PROPERTIES.some(function(p){ return p.id === id; }); }).length;
+  document.getElementById('cnt-favorites').textContent = PROPERTIES.filter(function(p){ return p.favorite === true; }).length;
 }
 
 function initMap() {
@@ -216,7 +215,7 @@ function initMap() {
   var bounds = new google.maps.LatLngBounds();
 
   PROPERTIES.forEach(function(p) {
-    var isFav = favorites.indexOf(p.id) !== -1;
+    var isFav = p.favorite === true;
     var pos = { lat: p.latitude, lng: p.longitude };
     var marker = new google.maps.Marker({
       position: pos,
