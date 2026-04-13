@@ -619,7 +619,7 @@ export const ALL_PROPERTIES = [
     neighborhood: "Royalwood",
     schools: "Hamilton Southeastern",
     commuteHusband: 33,
-    status: "Off Market",
+    status: "Sold",
     daysOnMarket: "New",
     walkScore: 46,
     bikeScore: 65,
