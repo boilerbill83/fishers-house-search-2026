@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import { ALL_PROPERTIES } from "./propertyData";
 
-// ── HELPERS ──────────────────────────────────────────────────────────────────
+// ── HELPERS ───────────────────────────────────────────────────────────────────
 
 const normalize = (value, min, max, inverse = false) => {
   if (max === min) return 100;
@@ -15,18 +15,18 @@ const normalize = (value, min, max, inverse = false) => {
 
 // Compute min/max bounds once over the full houses array
 const computeBounds = (houses) => ({
-  prices:   { min: Math.min(...houses.map(h => h.price)),          max: Math.max(...houses.map(h => h.price)) },
-  commutes: { min: Math.min(...houses.map(h => h.commuteHusband)), max: Math.max(...houses.map(h => h.commuteHusband)) },
-  beds:     { min: Math.min(...houses.map(h => h.beds)),           max: Math.max(...houses.map(h => h.beds)) },
-  baths:    { min: Math.min(...houses.map(h => h.baths)),          max: Math.max(...houses.map(h => h.baths)) },
-  sqfts:    { min: Math.min(...houses.map(h => h.sqft)),           max: Math.max(...houses.map(h => h.sqft)) },
-  years:    { min: Math.min(...houses.map(h => h.yearBuilt)),      max: Math.max(...houses.map(h => h.yearBuilt)) },
-  hoas:     { min: Math.min(...houses.map(h => (h.hoaAnnual || 0) / 12)), max: Math.max(...houses.map(h => (h.hoaAnnual || 0) / 12)) },
-  lots:     { min: Math.min(...houses.map(h => h.lotSize)),        max: Math.max(...houses.map(h => h.lotSize)) },
-  ppsqfts:  { min: Math.min(...houses.map(h => h.pricePerSqft)),   max: Math.max(...houses.map(h => h.pricePerSqft)) },
+  prices:   { min: Math.min(...houses.map(h => h.price)),                      max: Math.max(...houses.map(h => h.price)) },
+  commutes: { min: Math.min(...houses.map(h => h.commuteHusband)),             max: Math.max(...houses.map(h => h.commuteHusband)) },
+  beds:     { min: Math.min(...houses.map(h => h.beds)),                       max: Math.max(...houses.map(h => h.beds)) },
+  baths:    { min: Math.min(...houses.map(h => h.baths)),                      max: Math.max(...houses.map(h => h.baths)) },
+  sqfts:    { min: Math.min(...houses.map(h => h.sqft)),                       max: Math.max(...houses.map(h => h.sqft)) },
+  years:    { min: Math.min(...houses.map(h => h.yearBuilt)),                  max: Math.max(...houses.map(h => h.yearBuilt)) },
+  hoas:     { min: Math.min(...houses.map(h => (h.hoaAnnual || 0) / 12)),     max: Math.max(...houses.map(h => (h.hoaAnnual || 0) / 12)) },
+  lots:     { min: Math.min(...houses.map(h => h.lotSize)),                    max: Math.max(...houses.map(h => h.lotSize)) },
+  ppsqfts:  { min: Math.min(...houses.map(h => h.pricePerSqft)),               max: Math.max(...houses.map(h => h.pricePerSqft)) },
 });
 
-// ── SCORING (bounds pre-computed) ────────────────────────────────────────────
+// ── SCORING ───────────────────────────────────────────────────────────────────
 
 const calculateScore = (house, bounds, scoringWeights, scoringEnabled) => {
   let totalScore = 0;
@@ -70,7 +70,7 @@ const calculateScore = (house, bounds, scoringWeights, scoringEnabled) => {
   if (scoringEnabled.daysOnMarket) {
     const daysMatch = house.daysOnMarket.match(/(\d+)/);
     const days = daysMatch ? parseInt(daysMatch[1]) : 0;
-    // FIX: longer on market = lower score (was previously inverted)
+    // Longer on market = lower score
     addScore("daysOnMarket", Math.max(100 - (days / 180) * 100, 0), scoringWeights.daysOnMarket);
   }
 
@@ -83,7 +83,7 @@ const calculateNormalizedScore = (house, houses, bounds, scoringWeights, scoring
   return { total: Math.round(rawScore + (100 - Math.max(...allRaw))) };
 };
 
-// ── HOUSE CARD (lifted outside HouseTrackerApp to prevent remounting) ────────
+// ── HOUSE CARD (outside HouseTrackerApp to prevent remounting) ────────────────
 
 const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) => {
   const score = calculateNormalizedScore(house, houses, bounds, scoringWeights, scoringEnabled);
@@ -190,10 +190,10 @@ const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) =>
       </div>
 
       <div className="grid grid-cols-2 gap-2 mb-2 p-2 bg-gray-50 rounded text-sm md:text-base">
-        <div className="flex items-center gap-1.5"><Bed  className="text-blue-600 flex-shrink-0" size={18} /><span>{house.beds} beds</span></div>
-        <div className="flex items-center gap-1.5"><Bath className="text-blue-600 flex-shrink-0" size={18} /><span>{house.baths} baths</span></div>
+        <div className="flex items-center gap-1.5"><Bed    className="text-blue-600 flex-shrink-0" size={18} /><span>{house.beds} beds</span></div>
+        <div className="flex items-center gap-1.5"><Bath   className="text-blue-600 flex-shrink-0" size={18} /><span>{house.baths} baths</span></div>
         <div className="flex items-center gap-1.5"><Square className="text-blue-600 flex-shrink-0" size={18} /><span>{house.sqft ? house.sqft.toLocaleString() : "?"} sqft</span></div>
-        <div className="flex items-center gap-1.5"><Car  className="text-blue-600 flex-shrink-0" size={18} /><span>{house.garage}-car</span></div>
+        <div className="flex items-center gap-1.5"><Car    className="text-blue-600 flex-shrink-0" size={18} /><span>{house.garage}-car</span></div>
       </div>
 
       <div className="space-y-1.5 text-sm md:text-base border-t pt-2">
@@ -212,7 +212,7 @@ const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) =>
   );
 };
 
-// ── SCORING PREFERENCES MODAL ────────────────────────────────────────────────
+// ── SCORING PREFERENCES MODAL ─────────────────────────────────────────────────
 
 const ScoringPreferencesModal = ({ scoringWeights, setScoringWeights, scoringEnabled, setScoringEnabled, onClose }) => {
   const labels = {
@@ -263,20 +263,21 @@ const ScoringPreferencesModal = ({ scoringWeights, setScoringWeights, scoringEna
   );
 };
 
-// ── MAIN APP ─────────────────────────────────────────────────────────────────
+// ── MAIN APP ──────────────────────────────────────────────────────────────────
 
 const HouseTrackerApp = () => {
   const [houses] = useState(ALL_PROPERTIES);
   const [showScoringPreferences, setShowScoringPreferences] = useState(false);
-  const [showFinancials, setShowFinancials] = useState(false);
-  const [showSummaryTable, setShowSummaryTable] = useState(false);
+  const [showFinancials, setShowFinancials]                 = useState(false);
+  const [showSummaryTable, setShowSummaryTable]             = useState(false);
+  const [selectedHouseId, setSelectedHouseId]               = useState("");
 
   const [financials, setFinancials] = useState(() => {
     const saved = localStorage.getItem("houseHuntFinancials");
     return saved ? JSON.parse(saved) : {
-      homePrice: 500000, houseSellPrice: 118000, closingCostsPercent: 8,
-      additionalCash: 0, interestRate: 5.88, loanTerm: 30,
-      propertyTax: 5450, homeInsurance: 2400, hoaFees: 0,
+      homePrice: 650000, houseSellPrice: 118000,
+      additionalCash: 0, interestRate: 6.75, loanTerm: 30,
+      homeInsurance: 2400, hoaFees: 0,
     };
   });
 
@@ -300,20 +301,17 @@ const HouseTrackerApp = () => {
     };
   });
 
-  const [statusFilter, setStatusFilter]           = useState("all");
+  const [statusFilter, setStatusFilter]               = useState("all");
   const [summaryStatusFilter, setSummaryStatusFilter] = useState("Active");
-  const [summarySort, setSummarySort]             = useState({ key: "score", direction: "desc" });
-  // NEW: sort state for the main card grid
-  const [cardSort, setCardSort]                   = useState({ key: "score", direction: "desc" });
+  const [summarySort, setSummarySort]                 = useState({ key: "score", direction: "desc" });
 
   React.useEffect(() => { localStorage.setItem("houseHuntFinancials", JSON.stringify(financials)); }, [financials]);
-  React.useEffect(() => { localStorage.setItem("scoringWeights", JSON.stringify(scoringWeights)); }, [scoringWeights]);
-  React.useEffect(() => { localStorage.setItem("scoringEnabled", JSON.stringify(scoringEnabled)); }, [scoringEnabled]);
+  React.useEffect(() => { localStorage.setItem("scoringWeights",      JSON.stringify(scoringWeights)); }, [scoringWeights]);
+  React.useEffect(() => { localStorage.setItem("scoringEnabled",      JSON.stringify(scoringEnabled)); }, [scoringEnabled]);
 
-  // Pre-compute bounds once — only recalculates when houses array changes
+  // Pre-compute bounds once
   const bounds = useMemo(() => computeBounds(houses), [houses]);
 
-  // Stable score helper using memoised bounds
   const getScore = (house) => calculateNormalizedScore(house, houses, bounds, scoringWeights, scoringEnabled);
 
   const stats = useMemo(() => ({
@@ -324,47 +322,19 @@ const HouseTrackerApp = () => {
     favorites: houses.filter(h => h.favorite === true).length,
   }), [houses]);
 
-  // Status-filtered list, then sorted by card sort controls
   const sortedHouses = useMemo(() => {
     let filtered = [...houses];
     if (statusFilter === "active")    filtered = filtered.filter(h => h.status === "Active");
     if (statusFilter === "favorites") filtered = filtered.filter(h => h.favorite === true);
-
-    // Status tier ordering (Active first, then Pending, then Sold)
-    // only applies when sorting by score (the default)
     filtered.sort((a, b) => {
       const statusOrder = { Active: 0, Pending: 1, Sold: 2 };
-
-      if (cardSort.key === "score") {
-        const tierDiff = (statusOrder[a.status] || 0) - (statusOrder[b.status] || 0);
-        if (tierDiff !== 0) return tierDiff;
-        return cardSort.direction === "desc"
-          ? getScore(b).total - getScore(a).total
-          : getScore(a).total - getScore(b).total;
-      }
-
-      let aVal, bVal;
-      if      (cardSort.key === "price")     { aVal = a.price;     bVal = b.price; }
-      else if (cardSort.key === "beds")      { aVal = a.beds;      bVal = b.beds; }
-      else if (cardSort.key === "sqft")      { aVal = a.sqft;      bVal = b.sqft; }
-      else if (cardSort.key === "yearBuilt") { aVal = a.yearBuilt; bVal = b.yearBuilt; }
-      else                                   { aVal = 0;           bVal = 0; }
-
-      return cardSort.direction === "desc" ? bVal - aVal : aVal - bVal;
+      const tierDiff = (statusOrder[a.status] || 0) - (statusOrder[b.status] || 0);
+      if (tierDiff !== 0) return tierDiff;
+      return getScore(b).total - getScore(a).total;
     });
-
     return filtered;
-  }, [houses, scoringWeights, scoringEnabled, statusFilter, cardSort, bounds]);
+  }, [houses, scoringWeights, scoringEnabled, statusFilter, bounds]);
 
-  const handleCardSort = (key) => {
-    setCardSort(prev =>
-      prev.key === key
-        ? { key, direction: prev.direction === "asc" ? "desc" : "asc" }
-        : { key, direction: key === "price" || key === "yearBuilt" ? "asc" : "desc" }
-    );
-  };
-
-  // Summary table
   const summarySortedHouses = useMemo(() => {
     const { key, direction } = summarySort;
     if (!key) return sortedHouses;
@@ -391,18 +361,22 @@ const HouseTrackerApp = () => {
     );
   };
 
-  const CARD_SORT_OPTIONS = [
-    { key: "score",     label: "Score" },
-    { key: "price",     label: "Price" },
-    { key: "beds",      label: "Beds" },
-    { key: "sqft",      label: "Sqft" },
-    { key: "yearBuilt", label: "Year Built" },
-  ];
+  // ── Monthly payment helper ─────────────────────────────────────────────────
+  const calcMonthlyPayment = (overrideRate = null) => {
+    const down     = ((financials.houseSellPrice - 115000) * 0.92) + financials.additionalCash;
+    const loan     = financials.homePrice - down;
+    const rate     = (overrideRate !== null ? overrideRate : financials.interestRate) / 100 / 12;
+    const n        = financials.loanTerm * 12;
+    const pi       = rate > 0 ? (loan * (rate * Math.pow(1 + rate, n))) / (Math.pow(1 + rate, n) - 1) : loan / n;
+    const propTax  = (financials.homePrice * 0.01085) / 12;
+    return pi + propTax + financials.homeInsurance / 12 + financials.hoaFees;
+  };
 
-  // ── RENDER ──────────────────────────────────────────────────────────────────
+  // ── RENDER ─────────────────────────────────────────────────────────────────
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 rounded-lg shadow-lg p-8 mb-6 text-white">
         <div className="flex items-center justify-between">
@@ -414,29 +388,47 @@ const HouseTrackerApp = () => {
         </div>
       </div>
 
-      {/* ── TOOLBAR — two-row responsive layout ── */}
-      <div className="bg-white rounded-lg shadow-md p-3 mb-4">
-        {/* Row 1: action buttons + stats */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+      {/* ── TOOLBAR ── */}
+      <div className="bg-white rounded-lg shadow-md p-3 mb-6">
+        <div className="flex flex-wrap items-center gap-2">
           {/* Action buttons */}
-          <div className="flex flex-wrap gap-2">
-            <button onClick={() => setShowFinancials(true)}
-              className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg text-sm">
-              <Calculator size={16} /> Financials
-            </button>
-            <button onClick={() => setShowScoringPreferences(true)}
-              className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg text-sm">
-              <Target size={16} /> Scoring
-            </button>
-            <button onClick={() => setShowSummaryTable(true)}
-              className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg text-sm">
-              <Download size={16} /> Summary
-            </button>
-            <button onClick={() => window.open('/fishers-house-search-2026/map/', '_blank')}
-              className="bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg text-sm">
-              <MapPin size={16} /> Map View
-            </button>
-          </div>
+          <button onClick={() => setShowFinancials(true)}
+            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg text-sm">
+            <Calculator size={16} /> Financials
+          </button>
+          <button onClick={() => setShowScoringPreferences(true)}
+            className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg text-sm">
+            <Target size={16} /> Scoring
+          </button>
+          <button onClick={() => setShowSummaryTable(true)}
+            className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg text-sm">
+            <Download size={16} /> Summary
+          </button>
+          <button onClick={() => window.open('/fishers-house-search-2026/map/', '_blank')}
+            className="bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg text-sm">
+            <MapPin size={16} /> Map View
+          </button>
+
+          {/* Divider */}
+          <div className="hidden sm:block w-px h-8 bg-gray-200 mx-1" />
+
+          {/* Status filters */}
+          <button onClick={() => setStatusFilter("all")}
+            className={`px-3 py-2 rounded-lg font-semibold text-sm transition-all ${statusFilter === "all" ? "bg-blue-600 text-white shadow-lg" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}>
+            Show All
+          </button>
+          <button onClick={() => setStatusFilter("active")}
+            className={`px-3 py-2 rounded-lg font-semibold text-sm transition-all ${statusFilter === "active" ? "bg-green-600 text-white shadow-lg" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}>
+            Active Only
+          </button>
+          <button onClick={() => setStatusFilter("favorites")}
+            className={`px-3 py-2 rounded-lg font-semibold text-sm transition-all flex items-center gap-1 ${statusFilter === "favorites" ? "bg-pink-500 text-white shadow-lg" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}>
+            <Heart size={14} className={statusFilter === "favorites" ? "fill-white" : "fill-pink-500 text-pink-500"} />
+            Saved
+          </button>
+
+          {/* Divider */}
+          <div className="hidden sm:block w-px h-8 bg-gray-200 mx-1" />
 
           {/* Stats */}
           <div className="flex gap-3 text-sm">
@@ -446,50 +438,12 @@ const HouseTrackerApp = () => {
             <div className="text-center"><div className="text-xl font-bold text-blue-600">{stats.total}</div><div className="text-xs text-gray-600">Total</div></div>
             <div className="text-center"><div className="text-xl font-bold text-pink-500">{stats.favorites}</div><div className="text-xs text-gray-600">Saved</div></div>
           </div>
-        </div>
 
-        {/* Row 2: status filters + showing count */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-3">
-          <div className="flex flex-wrap gap-2">
-            <button onClick={() => setStatusFilter("all")}
-              className={`px-3 py-2 rounded-lg font-semibold text-sm transition-all ${statusFilter === "all" ? "bg-blue-600 text-white shadow-lg" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}>
-              Show All
-            </button>
-            <button onClick={() => setStatusFilter("active")}
-              className={`px-3 py-2 rounded-lg font-semibold text-sm transition-all ${statusFilter === "active" ? "bg-green-600 text-white shadow-lg" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}>
-              Active Only
-            </button>
-            <button onClick={() => setStatusFilter("favorites")}
-              className={`px-3 py-2 rounded-lg font-semibold text-sm transition-all flex items-center gap-1 ${statusFilter === "favorites" ? "bg-pink-500 text-white shadow-lg" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}>
-              <Heart size={14} className={statusFilter === "favorites" ? "fill-white" : "fill-pink-500 text-pink-500"} />
-              Saved
-            </button>
-          </div>
-          <div className="text-sm text-gray-600">
+          {/* Showing count */}
+          <div className="text-sm text-gray-600 ml-auto">
             <span className="font-bold">{sortedHouses.length}</span> of <span className="font-bold">{houses.length}</span>
           </div>
         </div>
-      </div>
-
-      {/* ── CARD SORT BAR ── */}
-      <div className="bg-white rounded-lg shadow-md px-3 py-2 mb-4 flex flex-wrap items-center gap-2">
-        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-1">Sort:</span>
-        {CARD_SORT_OPTIONS.map(({ key, label }) => {
-          const isActive = cardSort.key === key;
-          return (
-            <button key={key} onClick={() => handleCardSort(key)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1 ${
-                isActive
-                  ? "bg-blue-600 text-white shadow"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}>
-              {label}
-              {isActive && (
-                <span className="text-xs">{cardSort.direction === "desc" ? "▼" : "▲"}</span>
-              )}
-            </button>
-          );
-        })}
       </div>
 
       {/* ── CARD GRID ── */}
@@ -527,10 +481,40 @@ const HouseTrackerApp = () => {
                 <button onClick={() => setShowFinancials(false)} className="text-gray-400 hover:text-gray-600"><X size={24} /></button>
               </div>
               <div className="space-y-4">
+
+                {/* ── Property Selector ── */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Select Property</label>
+                  <select
+                    value={selectedHouseId}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      setSelectedHouseId(id);
+                      if (id) {
+                        const h = houses.find(x => x.id === id);
+                        if (h) setFinancials(f => ({ ...f, homePrice: h.price, hoaFees: Math.round((h.hoaAnnual || 0) / 12) }));
+                      }
+                    }}
+                    className="w-full border rounded px-3 py-2 bg-white"
+                  >
+                    <option value="">— enter manually —</option>
+                    {[...houses].sort((a, b) => a.address.localeCompare(b.address)).map(h => (
+                      <option key={h.id} value={h.id}>
+                        {h.address} — ${Math.round(h.price / 1000)}K{h.status !== "Active" ? ` (${h.status})` : ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* ── Home Price ── */}
                 <div>
                   <label className="block text-sm font-medium mb-1">Home Price</label>
-                  <input type="number" value={financials.homePrice} onChange={(e) => setFinancials({ ...financials, homePrice: parseFloat(e.target.value) || 0 })} className="w-full border rounded px-3 py-2" />
+                  <input type="number" value={financials.homePrice}
+                    onChange={(e) => { setSelectedHouseId(""); setFinancials({ ...financials, homePrice: parseFloat(e.target.value) || 0 }); }}
+                    className="w-full border rounded px-3 py-2" />
                 </div>
+
+                {/* ── Down Payment block ── */}
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <h4 className="font-semibold mb-3">Down Payment</h4>
                   <div className="mb-3 bg-gray-100 p-3 rounded">
@@ -539,62 +523,128 @@ const HouseTrackerApp = () => {
                   </div>
                   <div className="mb-3">
                     <label className="block text-sm font-medium mb-1">Expected Sale Price</label>
-                    <input type="number" value={financials.houseSellPrice} onChange={(e) => setFinancials({ ...financials, houseSellPrice: parseFloat(e.target.value) || 0 })} className="w-full border rounded px-3 py-2" />
-                    <p className="text-sm text-gray-600 mt-1">Net: ${(financials.houseSellPrice - 115000).toLocaleString()}</p>
-                  </div>
-                  <div className="mb-3">
-                    <label className="block text-sm font-medium mb-1">Closing Costs (%)</label>
-                    <input type="number" step="0.5" value={financials.closingCostsPercent} onChange={(e) => setFinancials({ ...financials, closingCostsPercent: parseFloat(e.target.value) || 0 })} className="w-full border rounded px-3 py-2" />
+                    <input type="number" value={financials.houseSellPrice}
+                      onChange={(e) => setFinancials({ ...financials, houseSellPrice: parseFloat(e.target.value) || 0 })}
+                      className="w-full border rounded px-3 py-2" />
+                    <p className="text-sm text-gray-600 mt-1">
+                      Net proceeds: ${Math.round((financials.houseSellPrice - 115000) * 0.92).toLocaleString()}
+                    </p>
+                    <p className="text-xs text-gray-400">= (sale price − amount owed) × 92%</p>
                   </div>
                   <div className="mb-3">
                     <label className="block text-sm font-medium mb-1">Extra Cash</label>
-                    <input type="number" value={financials.additionalCash} onChange={(e) => setFinancials({ ...financials, additionalCash: parseFloat(e.target.value) || 0 })} className="w-full border rounded px-3 py-2" />
+                    <input type="number" value={financials.additionalCash}
+                      onChange={(e) => setFinancials({ ...financials, additionalCash: parseFloat(e.target.value) || 0 })}
+                      className="w-full border rounded px-3 py-2" />
                   </div>
-                  <div className="pt-3 border-t">
+                  <div className="pt-3 border-t space-y-2">
                     <div className="flex justify-between font-semibold">
                       <span>Total Down:</span>
-                      <span>${(() => { const net = financials.houseSellPrice - 115000; const closing = (financials.homePrice * financials.closingCostsPercent) / 100; return (net - closing + financials.additionalCash).toLocaleString(); })()}</span>
+                      <span>${Math.round(((financials.houseSellPrice - 115000) * 0.92) + financials.additionalCash).toLocaleString()}</span>
                     </div>
+                    {(() => {
+                      const buyerClosing = Math.round(financials.homePrice * 0.025);
+                      const totalDown    = Math.round(((financials.houseSellPrice - 115000) * 0.92) + financials.additionalCash);
+                      return (
+                        <>
+                          <div className="flex justify-between text-sm text-gray-600">
+                            <span>Buyer Closing Costs (est.):</span>
+                            <span>${buyerClosing.toLocaleString()} <span className="text-xs text-gray-400">(2.5% of price)</span></span>
+                          </div>
+                          <div className="flex justify-between font-semibold text-blue-700 border-t pt-2">
+                            <span>Cash Needed at Closing:</span>
+                            <span>${(totalDown + buyerClosing).toLocaleString()}</span>
+                          </div>
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
+
+                {/* ── Interest Rate ── */}
                 <div>
                   <label className="block text-sm font-medium mb-1">Interest Rate (%)</label>
-                  <input type="number" step="0.01" value={financials.interestRate} onChange={(e) => setFinancials({ ...financials, interestRate: parseFloat(e.target.value) || 0 })} className="w-full border rounded px-3 py-2" />
+                  <input type="number" step="0.01" value={financials.interestRate}
+                    onChange={(e) => setFinancials({ ...financials, interestRate: parseFloat(e.target.value) || 0 })}
+                    className="w-full border rounded px-3 py-2" />
                 </div>
+
+                {/* ── Loan Term ── */}
                 <div>
                   <label className="block text-sm font-medium mb-1">Loan Term</label>
-                  <select value={financials.loanTerm} onChange={(e) => setFinancials({ ...financials, loanTerm: parseInt(e.target.value) })} className="w-full border rounded px-3 py-2">
+                  <select value={financials.loanTerm}
+                    onChange={(e) => setFinancials({ ...financials, loanTerm: parseInt(e.target.value) })}
+                    className="w-full border rounded px-3 py-2">
                     <option value={15}>15 years</option>
                     <option value={30}>30 years</option>
                   </select>
                 </div>
+
+                {/* ── Est. Property Tax (read-only) ── */}
                 <div>
-                  <label className="block text-sm font-medium mb-1">Annual Property Tax</label>
-                  <input type="number" value={financials.propertyTax} onChange={(e) => setFinancials({ ...financials, propertyTax: parseFloat(e.target.value) || 0 })} className="w-full border rounded px-3 py-2" />
+                  <label className="block text-sm font-medium mb-1">Est. Property Tax (1.085%)</label>
+                  <div className="bg-gray-50 border rounded px-3 py-2 text-gray-600 flex justify-between">
+                    <span>${Math.round(financials.homePrice * 0.01085).toLocaleString()} / year</span>
+                    <span className="text-gray-400">${Math.round(financials.homePrice * 0.01085 / 12).toLocaleString()} / mo</span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">Based on Fishers effective rate (Hamilton County, 2025)</p>
                 </div>
+
+                {/* ── Annual Insurance ── */}
                 <div>
                   <label className="block text-sm font-medium mb-1">Annual Insurance</label>
-                  <input type="number" value={financials.homeInsurance} onChange={(e) => setFinancials({ ...financials, homeInsurance: parseFloat(e.target.value) || 0 })} className="w-full border rounded px-3 py-2" />
+                  <input type="number" value={financials.homeInsurance}
+                    onChange={(e) => setFinancials({ ...financials, homeInsurance: parseFloat(e.target.value) || 0 })}
+                    className="w-full border rounded px-3 py-2" />
                 </div>
+
+                {/* ── Monthly HOA ── */}
                 <div>
                   <label className="block text-sm font-medium mb-1">Monthly HOA</label>
-                  <input type="number" value={financials.hoaFees} onChange={(e) => setFinancials({ ...financials, hoaFees: parseFloat(e.target.value) || 0 })} className="w-full border rounded px-3 py-2" />
+                  <input type="number" value={financials.hoaFees}
+                    onChange={(e) => setFinancials({ ...financials, hoaFees: parseFloat(e.target.value) || 0 })}
+                    className="w-full border rounded px-3 py-2" />
+                </div>
+
+              </div>
+
+              {/* ── Monthly Payment Result ── */}
+              <div className="mt-6 p-4 bg-green-50 rounded-lg">
+                <h4 className="font-bold text-lg mb-1">Monthly Payment</h4>
+                <div className="text-3xl font-bold text-green-700">
+                  ${calcMonthlyPayment().toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/month
                 </div>
               </div>
-              <div className="mt-6 p-4 bg-green-50 rounded-lg">
-                <h4 className="font-bold text-lg mb-4">Monthly Payment</h4>
-                {(() => {
-                  const net     = financials.houseSellPrice - 115000;
-                  const closing = (financials.homePrice * financials.closingCostsPercent) / 100;
-                  const down    = net - closing + financials.additionalCash;
-                  const loan    = financials.homePrice - down;
-                  const rate    = financials.interestRate / 100 / 12;
-                  const n       = financials.loanTerm * 12;
-                  const pi      = (loan * (rate * Math.pow(1 + rate, n))) / (Math.pow(1 + rate, n) - 1);
-                  const total   = pi + financials.propertyTax / 12 + financials.homeInsurance / 12 + financials.hoaFees;
-                  return <div className="text-2xl font-bold text-green-700">${total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/month</div>;
-                })()}
+
+              {/* ── Rate Sensitivity ── */}
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <h4 className="font-bold text-base mb-0.5">Rate Sensitivity</h4>
+                <p className="text-xs text-gray-500 mb-3">Monthly payment at different interest rates</p>
+                <div className="grid grid-cols-5 gap-2">
+                  {[-1, -0.5, 0, 0.5, 1].map((delta) => {
+                    const adjRate   = Math.max(financials.interestRate + delta, 0.01);
+                    const total     = calcMonthlyPayment(adjRate);
+                    const isCurrent = delta === 0;
+                    return (
+                      <div key={delta}
+                        className={`rounded-lg p-2 text-center border-2 ${isCurrent ? "bg-blue-600 border-blue-600 text-white" : "bg-white border-gray-200 text-gray-700"}`}>
+                        <div className={`text-xs font-semibold mb-1 ${isCurrent ? "text-blue-100" : "text-gray-500"}`}>
+                          {adjRate.toFixed(2)}%
+                        </div>
+                        <div className={`text-sm font-bold ${isCurrent ? "text-white" : "text-gray-800"}`}>
+                          ${Math.round(total).toLocaleString()}
+                        </div>
+                        {delta !== 0 && (
+                          <div className={`text-xs mt-0.5 ${delta > 0 ? "text-red-500" : "text-green-600"}`}>
+                            {delta > 0 ? "+" : ""}{delta.toFixed(1)}%
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
+
             </div>
           </div>
         </div>
@@ -676,6 +726,7 @@ const HouseTrackerApp = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };
