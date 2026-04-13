@@ -13,17 +13,16 @@ const normalize = (value, min, max, inverse = false) => {
   return inverse ? 100 - n : n;
 };
 
-// Compute min/max bounds once over the full houses array
 const computeBounds = (houses) => ({
-  prices:   { min: Math.min(...houses.map(h => h.price)),                      max: Math.max(...houses.map(h => h.price)) },
-  commutes: { min: Math.min(...houses.map(h => h.commuteHusband)),             max: Math.max(...houses.map(h => h.commuteHusband)) },
-  beds:     { min: Math.min(...houses.map(h => h.beds)),                       max: Math.max(...houses.map(h => h.beds)) },
-  baths:    { min: Math.min(...houses.map(h => h.baths)),                      max: Math.max(...houses.map(h => h.baths)) },
-  sqfts:    { min: Math.min(...houses.map(h => h.sqft)),                       max: Math.max(...houses.map(h => h.sqft)) },
-  years:    { min: Math.min(...houses.map(h => h.yearBuilt)),                  max: Math.max(...houses.map(h => h.yearBuilt)) },
-  hoas:     { min: Math.min(...houses.map(h => (h.hoaAnnual || 0) / 12)),     max: Math.max(...houses.map(h => (h.hoaAnnual || 0) / 12)) },
-  lots:     { min: Math.min(...houses.map(h => h.lotSize)),                    max: Math.max(...houses.map(h => h.lotSize)) },
-  ppsqfts:  { min: Math.min(...houses.map(h => h.pricePerSqft)),               max: Math.max(...houses.map(h => h.pricePerSqft)) },
+  prices:   { min: Math.min(...houses.map(h => h.price)),                  max: Math.max(...houses.map(h => h.price)) },
+  commutes: { min: Math.min(...houses.map(h => h.commuteHusband)),         max: Math.max(...houses.map(h => h.commuteHusband)) },
+  beds:     { min: Math.min(...houses.map(h => h.beds)),                   max: Math.max(...houses.map(h => h.beds)) },
+  baths:    { min: Math.min(...houses.map(h => h.baths)),                  max: Math.max(...houses.map(h => h.baths)) },
+  sqfts:    { min: Math.min(...houses.map(h => h.sqft)),                   max: Math.max(...houses.map(h => h.sqft)) },
+  years:    { min: Math.min(...houses.map(h => h.yearBuilt)),              max: Math.max(...houses.map(h => h.yearBuilt)) },
+  hoas:     { min: Math.min(...houses.map(h => (h.hoaAnnual || 0) / 12)), max: Math.max(...houses.map(h => (h.hoaAnnual || 0) / 12)) },
+  lots:     { min: Math.min(...houses.map(h => h.lotSize)),                max: Math.max(...houses.map(h => h.lotSize)) },
+  ppsqfts:  { min: Math.min(...houses.map(h => h.pricePerSqft)),           max: Math.max(...houses.map(h => h.pricePerSqft)) },
 });
 
 // ── SCORING ───────────────────────────────────────────────────────────────────
@@ -70,7 +69,6 @@ const calculateScore = (house, bounds, scoringWeights, scoringEnabled) => {
   if (scoringEnabled.daysOnMarket) {
     const daysMatch = house.daysOnMarket.match(/(\d+)/);
     const days = daysMatch ? parseInt(daysMatch[1]) : 0;
-    // Longer on market = lower score
     addScore("daysOnMarket", Math.max(100 - (days / 180) * 100, 0), scoringWeights.daysOnMarket);
   }
 
@@ -83,7 +81,7 @@ const calculateNormalizedScore = (house, houses, bounds, scoringWeights, scoring
   return { total: Math.round(rawScore + (100 - Math.max(...allRaw))) };
 };
 
-// ── HOUSE CARD (outside HouseTrackerApp to prevent remounting) ────────────────
+// ── HOUSE CARD ────────────────────────────────────────────────────────────────
 
 const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) => {
   const score = calculateNormalizedScore(house, houses, bounds, scoringWeights, scoringEnabled);
@@ -270,14 +268,22 @@ const HouseTrackerApp = () => {
   const [showScoringPreferences, setShowScoringPreferences] = useState(false);
   const [showFinancials, setShowFinancials]                 = useState(false);
   const [showSummaryTable, setShowSummaryTable]             = useState(false);
-  const [selectedHouseId, setSelectedHouseId]               = useState("");
+  const [selectedHouseId, setSelectedHouseId]               = useState(
+    () => ALL_PROPERTIES.find(h => h.favorite === true)?.id || ""
+  );
 
   const [financials, setFinancials] = useState(() => {
     const saved = localStorage.getItem("houseHuntFinancials");
-    return saved ? JSON.parse(saved) : {
-      homePrice: 650000, houseSellPrice: 118000,
-      additionalCash: 0, interestRate: 6.75, loanTerm: 30,
-      homeInsurance: 2400, hoaFees: 0,
+    if (saved) return JSON.parse(saved);
+    const fav = ALL_PROPERTIES.find(h => h.favorite === true);
+    return {
+      homePrice:      fav ? fav.price : 650000,
+      houseSellPrice: 405000,
+      additionalCash: 50000,
+      interestRate:   6.75,
+      loanTerm:       30,
+      homeInsurance:  2400,
+      hoaFees:        fav ? Math.round((fav.hoaAnnual || 0) / 12) : 0,
     };
   });
 
@@ -309,9 +315,7 @@ const HouseTrackerApp = () => {
   React.useEffect(() => { localStorage.setItem("scoringWeights",      JSON.stringify(scoringWeights)); }, [scoringWeights]);
   React.useEffect(() => { localStorage.setItem("scoringEnabled",      JSON.stringify(scoringEnabled)); }, [scoringEnabled]);
 
-  // Pre-compute bounds once
-  const bounds = useMemo(() => computeBounds(houses), [houses]);
-
+  const bounds   = useMemo(() => computeBounds(houses), [houses]);
   const getScore = (house) => calculateNormalizedScore(house, houses, bounds, scoringWeights, scoringEnabled);
 
   const stats = useMemo(() => ({
@@ -361,14 +365,13 @@ const HouseTrackerApp = () => {
     );
   };
 
-  // ── Monthly payment helper ─────────────────────────────────────────────────
   const calcMonthlyPayment = (overrideRate = null) => {
-    const down     = ((financials.houseSellPrice - 115000) * 0.92) + financials.additionalCash;
-    const loan     = financials.homePrice - down;
-    const rate     = (overrideRate !== null ? overrideRate : financials.interestRate) / 100 / 12;
-    const n        = financials.loanTerm * 12;
-    const pi       = rate > 0 ? (loan * (rate * Math.pow(1 + rate, n))) / (Math.pow(1 + rate, n) - 1) : loan / n;
-    const propTax  = (financials.homePrice * 0.01085) / 12;
+    const down    = ((financials.houseSellPrice - 113000) * 0.92) + financials.additionalCash;
+    const loan    = financials.homePrice - down;
+    const rate    = (overrideRate !== null ? overrideRate : financials.interestRate) / 100 / 12;
+    const n       = financials.loanTerm * 12;
+    const pi      = rate > 0 ? (loan * (rate * Math.pow(1 + rate, n))) / (Math.pow(1 + rate, n) - 1) : loan / n;
+    const propTax = (financials.homePrice * 0.01085) / 12;
     return pi + propTax + financials.homeInsurance / 12 + financials.hoaFees;
   };
 
@@ -391,6 +394,7 @@ const HouseTrackerApp = () => {
       {/* ── TOOLBAR ── */}
       <div className="bg-white rounded-lg shadow-md p-3 mb-6">
         <div className="flex flex-wrap items-center gap-2">
+
           {/* Action buttons */}
           <button onClick={() => setShowFinancials(true)}
             className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg text-sm">
@@ -409,7 +413,6 @@ const HouseTrackerApp = () => {
             <MapPin size={16} /> Map View
           </button>
 
-          {/* Divider */}
           <div className="hidden sm:block w-px h-8 bg-gray-200 mx-1" />
 
           {/* Status filters */}
@@ -427,7 +430,6 @@ const HouseTrackerApp = () => {
             Saved
           </button>
 
-          {/* Divider */}
           <div className="hidden sm:block w-px h-8 bg-gray-200 mx-1" />
 
           {/* Stats */}
@@ -482,7 +484,7 @@ const HouseTrackerApp = () => {
               </div>
               <div className="space-y-4">
 
-                {/* ── Property Selector ── */}
+                {/* Property Selector */}
                 <div>
                   <label className="block text-sm font-medium mb-1">Select Property</label>
                   <select
@@ -506,7 +508,7 @@ const HouseTrackerApp = () => {
                   </select>
                 </div>
 
-                {/* ── Home Price ── */}
+                {/* Home Price */}
                 <div>
                   <label className="block text-sm font-medium mb-1">Home Price</label>
                   <input type="number" value={financials.homePrice}
@@ -514,11 +516,11 @@ const HouseTrackerApp = () => {
                     className="w-full border rounded px-3 py-2" />
                 </div>
 
-                {/* ── Down Payment block ── */}
+                {/* Down Payment */}
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <h4 className="font-semibold mb-3">Down Payment</h4>
                   <div className="mb-3 bg-gray-100 p-3 rounded">
-                    <div className="text-2xl font-bold">$115,000</div>
+                    <div className="text-2xl font-bold">$113,000</div>
                     <p className="text-xs text-gray-600">Amount owed on current house</p>
                   </div>
                   <div className="mb-3">
@@ -527,7 +529,7 @@ const HouseTrackerApp = () => {
                       onChange={(e) => setFinancials({ ...financials, houseSellPrice: parseFloat(e.target.value) || 0 })}
                       className="w-full border rounded px-3 py-2" />
                     <p className="text-sm text-gray-600 mt-1">
-                      Net proceeds: ${Math.round((financials.houseSellPrice - 115000) * 0.92).toLocaleString()}
+                      Net proceeds: ${Math.round((financials.houseSellPrice - 113000) * 0.92).toLocaleString()}
                     </p>
                     <p className="text-xs text-gray-400">= (sale price − amount owed) × 92%</p>
                   </div>
@@ -540,11 +542,11 @@ const HouseTrackerApp = () => {
                   <div className="pt-3 border-t space-y-2">
                     <div className="flex justify-between font-semibold">
                       <span>Total Down:</span>
-                      <span>${Math.round(((financials.houseSellPrice - 115000) * 0.92) + financials.additionalCash).toLocaleString()}</span>
+                      <span>${Math.round(((financials.houseSellPrice - 113000) * 0.92) + financials.additionalCash).toLocaleString()}</span>
                     </div>
                     {(() => {
                       const buyerClosing = Math.round(financials.homePrice * 0.025);
-                      const totalDown    = Math.round(((financials.houseSellPrice - 115000) * 0.92) + financials.additionalCash);
+                      const totalDown    = Math.round(((financials.houseSellPrice - 113000) * 0.92) + financials.additionalCash);
                       return (
                         <>
                           <div className="flex justify-between text-sm text-gray-600">
@@ -561,7 +563,7 @@ const HouseTrackerApp = () => {
                   </div>
                 </div>
 
-                {/* ── Interest Rate ── */}
+                {/* Interest Rate */}
                 <div>
                   <label className="block text-sm font-medium mb-1">Interest Rate (%)</label>
                   <input type="number" step="0.01" value={financials.interestRate}
@@ -569,7 +571,7 @@ const HouseTrackerApp = () => {
                     className="w-full border rounded px-3 py-2" />
                 </div>
 
-                {/* ── Loan Term ── */}
+                {/* Loan Term */}
                 <div>
                   <label className="block text-sm font-medium mb-1">Loan Term</label>
                   <select value={financials.loanTerm}
@@ -580,7 +582,7 @@ const HouseTrackerApp = () => {
                   </select>
                 </div>
 
-                {/* ── Est. Property Tax (read-only) ── */}
+                {/* Est. Property Tax (read-only) */}
                 <div>
                   <label className="block text-sm font-medium mb-1">Est. Property Tax (1.085%)</label>
                   <div className="bg-gray-50 border rounded px-3 py-2 text-gray-600 flex justify-between">
@@ -590,7 +592,7 @@ const HouseTrackerApp = () => {
                   <p className="text-xs text-gray-400 mt-1">Based on Fishers effective rate (Hamilton County, 2025)</p>
                 </div>
 
-                {/* ── Annual Insurance ── */}
+                {/* Annual Insurance */}
                 <div>
                   <label className="block text-sm font-medium mb-1">Annual Insurance</label>
                   <input type="number" value={financials.homeInsurance}
@@ -598,7 +600,7 @@ const HouseTrackerApp = () => {
                     className="w-full border rounded px-3 py-2" />
                 </div>
 
-                {/* ── Monthly HOA ── */}
+                {/* Monthly HOA */}
                 <div>
                   <label className="block text-sm font-medium mb-1">Monthly HOA</label>
                   <input type="number" value={financials.hoaFees}
@@ -608,7 +610,7 @@ const HouseTrackerApp = () => {
 
               </div>
 
-              {/* ── Monthly Payment Result ── */}
+              {/* Monthly Payment Result */}
               <div className="mt-6 p-4 bg-green-50 rounded-lg">
                 <h4 className="font-bold text-lg mb-1">Monthly Payment</h4>
                 <div className="text-3xl font-bold text-green-700">
@@ -616,7 +618,7 @@ const HouseTrackerApp = () => {
                 </div>
               </div>
 
-              {/* ── Rate Sensitivity ── */}
+              {/* Rate Sensitivity */}
               <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                 <h4 className="font-bold text-base mb-0.5">Rate Sensitivity</h4>
                 <p className="text-xs text-gray-500 mb-3">Monthly payment at different interest rates</p>
