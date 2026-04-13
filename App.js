@@ -117,8 +117,8 @@ const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) =>
   const getStatusBadge = () => {
     if (!house.status || house.status === "Active") return null;
     return {
-      Pending: { bg: "bg-red-600",  text: "text-white", icon: "\u23f8\ufe0f", label: "PENDING" },
-      Sold:    { bg: "bg-gray-600", text: "text-white", icon: "\uD83D\uDEAB", label: "SOLD" },
+      Pending: { bg: "bg-red-600",  text: "text-white", icon: "⏸️", label: "PENDING" },
+      Sold:    { bg: "bg-gray-600", text: "text-white", icon: "🚫", label: "SOLD" },
     }[house.status] || null;
   };
   const statusBadge = getStatusBadge();
@@ -198,7 +198,7 @@ const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) =>
         <div className="flex justify-between"><span className="text-gray-600">Built:</span><span className="font-medium">{house.yearBuilt}</span></div>
         <div className="flex justify-between"><span className="text-gray-600">Commute:</span><span className="font-medium">{house.commuteHusband}m</span></div>
         <div className="flex justify-between"><span className="text-gray-600">Basement:</span><span className="font-medium">{house.basement || "No"}</span></div>
-        <div className="flex justify-between"><span className="text-gray-600">Pool:</span><span className="font-medium">{house.hasNeighborhoodPool ? "\u2713" : "\u2717"}</span></div>
+        <div className="flex justify-between"><span className="text-gray-600">Pool:</span><span className="font-medium">{house.hasNeighborhoodPool ? "✓" : "✗"}</span></div>
         {house.neighborhoodSummary && (
           <div className="pt-1 border-t border-gray-100">
             <span className="text-gray-500 text-xs font-medium uppercase tracking-wide">Area</span>
@@ -384,7 +384,7 @@ const HouseTrackerApp = () => {
       <div className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 rounded-lg shadow-lg p-8 mb-6 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold mb-2">\uD83C\uDFE1 Stoltenbergs House Hunt</h1>
+            <h1 className="text-4xl font-bold mb-2">🏡 Stoltenbergs House Hunt</h1>
             <p className="text-lg italic font-light">Where every house is perfect until we see the price.</p>
           </div>
           <Home size={64} className="opacity-50" />
@@ -526,7 +526,7 @@ const HouseTrackerApp = () => {
                     <p className="text-sm text-gray-600 mt-1">
                       Net proceeds: ${Math.round((financials.houseSellPrice - 113000) * 0.92).toLocaleString()}
                     </p>
-                    <p className="text-xs text-gray-400">= (sale price \u2212 amount owed) \u00d7 92%</p>
+                    <p className="text-xs text-gray-400">= (sale price − amount owed) × 92%</p>
                   </div>
                   <div className="mb-3">
                     <label className="block text-sm font-medium mb-1">Extra Cash</label>
@@ -555,7 +555,7 @@ const HouseTrackerApp = () => {
                           </div>
                           <div className="bg-amber-50 border border-amber-300 rounded p-2 mt-1">
                             <div className="flex justify-between font-bold text-amber-800">
-                              <span>\u2605 Cash to Wire at Closing:</span>
+                              <span>★ Cash to Wire at Closing:</span>
                               <span>${wireAmount.toLocaleString()}</span>
                             </div>
                             <p className="text-xs text-amber-600 mt-1">Your out-of-pocket wire on closing day (extra cash + closing costs). Home sale proceeds flow through the title company separately.</p>
@@ -690,8 +690,8 @@ const HouseTrackerApp = () => {
                         className={`border px-4 py-2 ${align} cursor-pointer select-none hover:bg-gray-200 whitespace-nowrap`}>
                         {label}{" "}
                         {summarySort.key === key
-                          ? summarySort.direction === "asc" ? "\u25b2" : "\u25bc"
-                          : <span className="text-gray-300">\u25bc</span>}
+                          ? summarySort.direction === "asc" ? "▲" : "▼"
+                          : <span className="text-gray-300">▼</span>}
                       </th>
                     ))}
                   </tr>
