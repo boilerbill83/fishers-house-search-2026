@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import {
   Home, Bed, Bath, Square, Car, X, Calculator, ExternalLink,
-  Target, Sliders, Download, MapPin,
+  Target, Sliders, Download, MapPin, Heart,
 } from "lucide-react";
 import { ALL_PROPERTIES } from "./propertyData";
 
@@ -43,10 +43,13 @@ const HouseTrackerApp = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [summaryStatusFilter, setSummaryStatusFilter] = useState("Active");
   const [summarySort, setSummarySort] = useState({ key: "score", direction: "desc" });
+  const [favorites, setFavorites] = useState(() => JSON.parse(localStorage.getItem("houseFavorites") || "[]"));
+  const toggleFavorite = (id) => setFavorites((prev) => prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]);
 
   React.useEffect(() => { localStorage.setItem("houseHuntFinancials", JSON.stringify(financials)); }, [financials]);
   React.useEffect(() => { localStorage.setItem("scoringWeights", JSON.stringify(scoringWeights)); }, [scoringWeights]);
   React.useEffect(() => { localStorage.setItem("scoringEnabled", JSON.stringify(scoringEnabled)); }, [scoringEnabled]);
+  React.useEffect(() => { localStorage.setItem("houseFavorites", JSON.stringify(favorites)); }, [favorites]);
 
   const calculateScore = (house) => {
     let totalScore = 0;
@@ -102,13 +105,14 @@ const HouseTrackerApp = () => {
   const sortedHouses = useMemo(() => {
     let filtered = [...houses];
     if (statusFilter === "active") filtered = filtered.filter((h) => h.status === "Active");
+    if (statusFilter === "favorites") filtered = filtered.filter((h) => favorites.includes(h.id));
     return filtered.sort((a, b) => {
       const order = { Active: 0, Pending: 1, Sold: 2 };
       const diff = (order[a.status] || 0) - (order[b.status] || 0);
       if (diff !== 0) return diff;
       return calculateNormalizedScore(b).total - calculateNormalizedScore(a).total;
     });
-  }, [houses, scoringWeights, scoringEnabled, statusFilter]);
+  }, [houses, scoringWeights, scoringEnabled, statusFilter, favorites]);
 
   const summarySortedHouses = useMemo(() => {
     const { key, direction } = summarySort;
@@ -136,11 +140,12 @@ const HouseTrackerApp = () => {
   };
 
   const stats = useMemo(() => ({
-    active:  houses.filter((h) => h.status === "Active").length,
-    pending: houses.filter((h) => h.status === "Pending").length,
-    sold:    houses.filter((h) => h.status === "Sold").length,
-    total:   houses.length,
-  }), [houses]);
+    active:    houses.filter((h) => h.status === "Active").length,
+    pending:   houses.filter((h) => h.status === "Pending").length,
+    sold:      houses.filter((h) => h.status === "Sold").length,
+    total:     houses.length,
+    favorites: favorites.length,
+  }), [houses, favorites]);
 
   // ── HOUSE CARD ──────────────────────────────────────────────────────────────
 
@@ -148,6 +153,7 @@ const HouseTrackerApp = () => {
     const score = calculateNormalizedScore(house);
 
     const getBorderColor = () => {
+      if (favorites.includes(house.id)) return "border-pink-500";
       if (house.status === "Pending" || house.status === "Sold") return "border-gray-300";
       const activeScores = houses.filter((h) => h.status === "Active")
         .map((h) => calculateNormalizedScore(h).total).sort((a, b) => b - a);
@@ -180,7 +186,7 @@ const HouseTrackerApp = () => {
     const statusBadge = getStatusBadge();
 
     return (
-      <div className={`bg-white rounded-lg shadow-md p-3 border-2 ${getBorderColor()} hover:shadow-lg hover:scale-[1.02] transition-all duration-200 ${isDimmed ? "opacity-60" : ""}`}>
+      <div className={`bg-white rounded-lg shadow-md p-3 border-2 ${getBorderColor()} hover:shadow-lg hover:scale-[1.02] transition-all duration-200 ${isDimmed ? "opacity-60" : ""} ${favorites.includes(house.id) ? "ring-2 ring-pink-300 ring-offset-1" : ""}`}>
         {house.imageUrl ? (
           <div className="mb-3 rounded overflow-hidden bg-gray-100 relative group">
             <img src={house.imageUrl} alt={house.address}
@@ -193,10 +199,18 @@ const HouseTrackerApp = () => {
                 </div>
               </div>
             )}
+            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(house.id); }}
+              className="absolute top-2 right-2 p-1.5 rounded-full bg-white bg-opacity-90 shadow-md hover:scale-110 transition-transform z-10">
+              <Heart size={18} className={favorites.includes(house.id) ? "fill-red-500 text-red-500" : "text-gray-400"} />
+            </button>
           </div>
         ) : (
-          <div className="mb-3 rounded bg-gray-100 h-40 flex items-center justify-center">
+          <div className="mb-3 rounded bg-gray-100 h-40 flex items-center justify-center relative">
             <div className="text-gray-500 text-sm">No Image</div>
+            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(house.id); }}
+              className="absolute top-2 right-2 p-1.5 rounded-full bg-white shadow-md hover:scale-110 transition-transform z-10">
+              <Heart size={18} className={favorites.includes(house.id) ? "fill-red-500 text-red-500" : "text-gray-400"} />
+            </button>
           </div>
         )}
 
@@ -338,10 +352,15 @@ const HouseTrackerApp = () => {
               <div className="text-center"><div className="text-xl font-bold text-red-600">{stats.pending}</div><div className="text-xs text-gray-600">Pending</div></div>
               <div className="text-center"><div className="text-xl font-bold text-gray-500">{stats.sold}</div><div className="text-xs text-gray-600">Sold</div></div>
               <div className="text-center"><div className="text-xl font-bold text-blue-600">{stats.total}</div><div className="text-xs text-gray-600">Total</div></div>
+              <div className="text-center"><div className="text-xl font-bold text-pink-500">{stats.favorites}</div><div className="text-xs text-gray-600">Saved</div></div>
             </div>
             <div className="flex gap-2">
               <button onClick={() => setStatusFilter("all")} className={`px-3 py-2 rounded-lg font-semibold text-sm transition-all ${statusFilter === "all" ? "bg-blue-600 text-white shadow-lg" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}>Show All</button>
               <button onClick={() => setStatusFilter("active")} className={`px-3 py-2 rounded-lg font-semibold text-sm transition-all ${statusFilter === "active" ? "bg-green-600 text-white shadow-lg" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}>Active Only</button>
+              <button onClick={() => setStatusFilter("favorites")} className={`px-3 py-2 rounded-lg font-semibold text-sm transition-all flex items-center gap-1 ${statusFilter === "favorites" ? "bg-pink-500 text-white shadow-lg" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}>
+                <Heart size={14} className={statusFilter === "favorites" ? "fill-white text-white" : "text-pink-500"} />
+                Saved
+              </button>
             </div>
             <div className="text-sm text-gray-600 border-l pl-4">
               <span className="font-bold">{sortedHouses.length}</span> of <span className="font-bold">{houses.length}</span>
