@@ -19,6 +19,7 @@
     .stat-num.green { color: #16a34a; }
     .stat-num.amber { color: #d97706; }
     .stat-num.gray  { color: #94a3b8; }
+    .stat-num.pink  { color: #ec4899; }
 
     .filter-btn {
       border: none; border-radius: 8px; padding: 5px 12px;
@@ -51,7 +52,7 @@
     .legend-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.15); flex-shrink: 0; }
 
     .gm-style .gm-style-iw-c { border-radius: 12px !important; padding: 0 !important; max-width: 280px !important; }
-    .gm-style .gm-style-iw-d { overflow: hidden !important; }</style></head><body><div id="map"></div><div id="toolbar"><div id="toolbar-row1"><h1>🏡 House Hunt Map</h1><div class="divider"></div><div class="stat"><div class="stat-num green" id="cnt-active">0</div><div class="stat-label">Active</div></div><div class="stat"><div class="stat-num amber" id="cnt-pending">0</div><div class="stat-label">Pending</div></div><div class="stat"><div class="stat-num gray" id="cnt-sold">0</div><div class="stat-label">Sold</div></div></div><div id="toolbar-row2"><button class="filter-btn inactive-filter" id="btn-all" onclick="setFilter('all')">Show All</button> <button class="filter-btn active-filter" id="btn-active" onclick="setFilter('active')">Active Only</button></div></div><div id="map-type-btns"><button class="map-type-btn active-type" id="btn-roadmap" onclick="setMapType('roadmap')">Road</button> <button class="map-type-btn" id="btn-satellite" onclick="setMapType('satellite')">Satellite</button> <button class="map-type-btn" id="btn-hybrid" onclick="setMapType('hybrid')">Hybrid</button> <button class="map-type-btn" id="btn-terrain" onclick="setMapType('terrain')">Terrain</button></div><div id="legend"><h3>Legend</h3><div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Active</div><div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Pending</div><div class="legend-item"><div class="legend-dot" style="background:#94a3b8"></div>Sold</div></div><script>// propertyData.js
+    .gm-style .gm-style-iw-d { overflow: hidden !important; }</style></head><body><div id="map"></div><div id="toolbar"><div id="toolbar-row1"><h1>🏡 House Hunt Map</h1><div class="divider"></div><div class="stat"><div class="stat-num green" id="cnt-active">0</div><div class="stat-label">Active</div></div><div class="stat"><div class="stat-num amber" id="cnt-pending">0</div><div class="stat-label">Pending</div></div><div class="stat"><div class="stat-num gray" id="cnt-sold">0</div><div class="stat-label">Sold</div></div><div class="stat"><div class="stat-num pink" id="cnt-favorites">0</div><div class="stat-label">Saved</div></div></div><div id="toolbar-row2"><button class="filter-btn inactive-filter" id="btn-all" onclick="setFilter('all')">Show All</button> <button class="filter-btn active-filter" id="btn-active" onclick="setFilter('active')">Active Only</button> <button class="filter-btn inactive-filter" id="btn-favorites" onclick="setFilter('favorites')" style="background:#fce7f3;color:#be185d;">&#9829; Saved</button></div></div><div id="map-type-btns"><button class="map-type-btn active-type" id="btn-roadmap" onclick="setMapType('roadmap')">Road</button> <button class="map-type-btn" id="btn-satellite" onclick="setMapType('satellite')">Satellite</button> <button class="map-type-btn" id="btn-hybrid" onclick="setMapType('hybrid')">Hybrid</button> <button class="map-type-btn" id="btn-terrain" onclick="setMapType('terrain')">Terrain</button></div><div id="legend"><h3>Legend</h3><div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Active</div><div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Pending</div><div class="legend-item"><div class="legend-dot" style="background:#94a3b8"></div>Sold</div><div class="legend-item"><div style="font-size:14px;line-height:1">&#9829;</div><span style="color:#be185d;font-weight:600">Saved</span></div></div><script>// propertyData.js
 // Last verified: April 4, 2026
 
 window.ALL_PROPERTIES = [
@@ -768,6 +769,7 @@ window.ALL_PROPERTIES = [
   },
 ];</script><script>var map, markers = [], infoWindow, currentFilter = 'active';
 var PROPERTIES = [];
+var favorites = JSON.parse(localStorage.getItem('houseFavorites') || '[]');
 
 function pinColor(status) {
   if (status === 'Active')  return { bg: '#22c55e', border: '#16a34a' };
@@ -775,14 +777,21 @@ function pinColor(status) {
   return { bg: '#94a3b8', border: '#64748b' };
 }
 
-function makePinIcon(status, price) {
+function makePinIcon(status, price, isFavorite) {
   var c = pinColor(status);
   var label = '$' + Math.round(price / 1000) + 'K';
+  var border = isFavorite ? '#db2777' : c.border;
+  var bw = isFavorite ? '2.5' : '1.5';
+  var heartBadge = isFavorite
+    ? '<circle cx="63" cy="10" r="9" fill="#ec4899" stroke="white" stroke-width="1.5"/>'
+      + '<text x="63" y="14.5" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" fill="white">\u2665</text>'
+    : '';
   var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="72" height="58" viewBox="0 0 72 58">'
-    + '<rect x="1" y="1" width="70" height="38" rx="8" ry="8" fill="' + c.bg + '" stroke="' + c.border + '" stroke-width="1.5"/>'
-    + '<polygon points="29,39 43,39 36,52" fill="' + c.bg + '" stroke="' + c.border + '" stroke-width="1.5"/>'
+    + '<rect x="1" y="1" width="70" height="38" rx="8" ry="8" fill="' + c.bg + '" stroke="' + border + '" stroke-width="' + bw + '"/>'
+    + '<polygon points="29,39 43,39 36,52" fill="' + c.bg + '" stroke="' + border + '" stroke-width="' + bw + '"/>'
     + '<polygon points="30,38 42,38 36,50" fill="' + c.bg + '"/>'
     + '<text x="36" y="25" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" font-weight="800" fill="white">' + label + '</text>'
+    + heartBadge
     + '</svg>';
   return {
     url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
@@ -792,13 +801,15 @@ function makePinIcon(status, price) {
 }
 
 function infoContent(p) {
+  var isFav = favorites.indexOf(p.id) !== -1;
   var statusBadge = p.status === 'Active'
     ? '<span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">&#9679; Active</span>'
     : p.status === 'Pending'
     ? '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">&#9679; Pending</span>'
     : '<span style="background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">&#9679; Sold</span>';
+  var favBadge = isFav ? '<span style="background:#fce7f3;color:#be185d;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">\u2665 Saved</span> ' : '';
   return '<div style="font-family:system-ui,sans-serif;padding:14px 16px;min-width:230px;max-width:270px">'
-    + '<div style="font-weight:700;font-size:14px;color:#1e293b;margin-bottom:4px">' + p.address + '</div>'
+    + '<div style="font-weight:700;font-size:14px;color:#1e293b;margin-bottom:4px">' + favBadge + p.address + '</div>'
     + '<div style="color:#64748b;font-size:12px;margin-bottom:8px">' + p.neighborhood + '</div>'
     + '<div style="font-size:22px;font-weight:800;color:#2563eb;margin-bottom:6px">$' + Math.round(p.price/1000) + 'K'
     + '<span style="font-size:12px;color:#64748b;font-weight:500;margin-left:4px">$' + Math.round(p.price/p.sqft) + '/sqft</span></div>'
@@ -815,10 +826,21 @@ function infoContent(p) {
 
 function setFilter(f) {
   currentFilter = f;
-  document.getElementById('btn-all').className    = 'filter-btn ' + (f === 'all'    ? 'active-filter' : 'inactive-filter');
-  document.getElementById('btn-active').className = 'filter-btn ' + (f === 'active' ? 'active-filter' : 'inactive-filter');
+  document.getElementById('btn-all').className      = 'filter-btn ' + (f === 'all'       ? 'active-filter' : 'inactive-filter');
+  document.getElementById('btn-active').className   = 'filter-btn ' + (f === 'active'    ? 'active-filter' : 'inactive-filter');
+  var favBtn = document.getElementById('btn-favorites');
+  if (f === 'favorites') {
+    favBtn.className = 'filter-btn active-filter';
+    favBtn.style.background = ''; favBtn.style.color = '';
+  } else {
+    favBtn.className = 'filter-btn inactive-filter';
+    favBtn.style.background = '#fce7f3'; favBtn.style.color = '#be185d';
+  }
   markers.forEach(function(m) {
-    m.marker.setVisible(f === 'all' || m.property.status === 'Active');
+    var visible = f === 'all'
+      || (f === 'active' && m.property.status === 'Active')
+      || (f === 'favorites' && favorites.indexOf(m.property.id) !== -1);
+    m.marker.setVisible(visible);
   });
   if (infoWindow) infoWindow.close();
 }
@@ -831,9 +853,10 @@ function setMapType(type) {
 }
 
 function updateStats() {
-  document.getElementById('cnt-active').textContent  = PROPERTIES.filter(function(p){ return p.status === 'Active'; }).length;
-  document.getElementById('cnt-pending').textContent = PROPERTIES.filter(function(p){ return p.status === 'Pending'; }).length;
-  document.getElementById('cnt-sold').textContent    = PROPERTIES.filter(function(p){ return p.status === 'Sold'; }).length;
+  document.getElementById('cnt-active').textContent    = PROPERTIES.filter(function(p){ return p.status === 'Active'; }).length;
+  document.getElementById('cnt-pending').textContent   = PROPERTIES.filter(function(p){ return p.status === 'Pending'; }).length;
+  document.getElementById('cnt-sold').textContent      = PROPERTIES.filter(function(p){ return p.status === 'Sold'; }).length;
+  document.getElementById('cnt-favorites').textContent = favorites.filter(function(id){ return PROPERTIES.some(function(p){ return p.id === id; }); }).length;
 }
 
 function initMap() {
@@ -858,13 +881,14 @@ function initMap() {
   var bounds = new google.maps.LatLngBounds();
 
   PROPERTIES.forEach(function(p) {
+    var isFav = favorites.indexOf(p.id) !== -1;
     var pos = { lat: p.latitude, lng: p.longitude };
     var marker = new google.maps.Marker({
       position: pos,
       map: map,
-      icon: makePinIcon(p.status, p.price),
+      icon: makePinIcon(p.status, p.price, isFav),
       title: p.address,
-      zIndex: p.status === 'Active' ? 10 : 5,
+      zIndex: isFav ? 20 : (p.status === 'Active' ? 10 : 5),
     });
     marker.addListener('click', function() {
       infoWindow.setContent(infoContent(p));
