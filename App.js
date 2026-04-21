@@ -85,6 +85,28 @@ const calculateNormalizedScore = (house, houses, bounds, scoringWeights, scoring
 
 const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) => {
   const score = calculateNormalizedScore(house, houses, bounds, scoringWeights, scoringEnabled);
+  const [liveCommute, setLiveCommute] = useState(null);
+  const [commuteLoading, setCommuteLoading] = useState(false);
+  const [commuteError, setCommuteError] = useState(false);
+
+  const fetchLiveCommute = async () => {
+    setCommuteLoading(true);
+    setCommuteError(false);
+    try {
+      const resp = await fetch("/.netlify/functions/commute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: `${house.address}, ${house.city}, IN` }),
+      });
+      const data = await resp.json();
+      if (data.minutes) setLiveCommute(data.minutes);
+      else setCommuteError(true);
+    } catch {
+      setCommuteError(true);
+    } finally {
+      setCommuteLoading(false);
+    }
+  };
 
   const getBorderColor = () => {
     if (house.favorite === true) return "border-pink-500";
@@ -196,7 +218,24 @@ const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) =>
 
       <div className="space-y-1.5 text-sm md:text-base border-t pt-2">
         <div className="flex justify-between"><span className="text-gray-600">Built:</span><span className="font-medium">{house.yearBuilt}</span></div>
-        <div className="flex justify-between"><span className="text-gray-600">Commute:</span><span className="font-medium">{house.commuteHusband}m</span></div>
+        <div className="flex justify-between items-center">
+          <span className="text-gray-600">Commute:</span>
+          <span className="flex items-center gap-1.5 font-medium">
+            {liveCommute ? (
+              <span className="text-blue-700">{liveCommute}m <span className="text-xs font-normal text-blue-500">(8am Tue live)</span></span>
+            ) : (
+              <span className={commuteError ? "text-red-400" : ""}>{house.commuteHusband}m</span>
+            )}
+            <button
+              onClick={fetchLiveCommute}
+              disabled={commuteLoading}
+              title="Fetch real 8am Tuesday commute to OneAmerica Tower"
+              className="text-xs px-1.5 py-0.5 rounded bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-800 disabled:opacity-40 transition-colors"
+            >
+              {commuteLoading ? "…" : liveCommute ? "↻" : "live"}
+            </button>
+          </span>
+        </div>
         <div className="flex justify-between"><span className="text-gray-600">Basement:</span><span className="font-medium">{house.basement || "No"}</span></div>
         <div className="flex justify-between"><span className="text-gray-600">Pool:</span><span className="font-medium">{house.hasNeighborhoodPool ? "✓" : "✗"}</span></div>
         {house.neighborhoodSummary && (
