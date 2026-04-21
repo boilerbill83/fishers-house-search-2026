@@ -93,14 +93,37 @@ const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) =>
     setCommuteLoading(true);
     setCommuteError(false);
     try {
-      const resp = await fetch("/.netlify/functions/commute", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address: `${house.address}, ${house.city}, IN` }),
+      const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+      if (!apiKey) throw new Error("No API key configured");
+
+      // Next Tuesday at 8am Eastern (EDT=UTC-4, EST=UTC-5)
+      const now = new Date();
+      const isDst = now.getMonth() >= 2 && now.getMonth() <= 10;
+      const targetUtcHour = isDst ? 12 : 13;
+      const dayOfWeek = now.getUTCDay();
+      let daysUntil = (2 - dayOfWeek + 7) % 7;
+      if (daysUntil === 0 && now.getUTCHours() >= targetUtcHour) daysUntil = 7;
+      const departure = new Date(now);
+      departure.setUTCDate(now.getUTCDate() + daysUntil);
+      departure.setUTCHours(targetUtcHour, 0, 0, 0);
+      const departureTime = Math.floor(departure.getTime() / 1000);
+
+      const params = new URLSearchParams({
+        origins: `${house.address}, ${house.city}, IN`,
+        destinations: "1 American Square, Indianapolis, IN 46282",
+        mode: "driving",
+        departure_time: departureTime,
+        traffic_model: "best_guess",
+        key: apiKey,
       });
+      const resp = await fetch(
+        `https://maps.googleapis.com/maps/api/distancematrix/json?${params}`
+      );
       const data = await resp.json();
-      if (data.minutes) setLiveCommute(data.minutes);
-      else setCommuteError(true);
+      const element = data?.rows?.[0]?.elements?.[0];
+      if (!element || element.status !== "OK") throw new Error("No route");
+      const seconds = element.duration_in_traffic?.value ?? element.duration?.value;
+      setLiveCommute(Math.round(seconds / 60));
     } catch {
       setCommuteError(true);
     } finally {

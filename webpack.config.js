@@ -1,5 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const webpack = require("webpack");
 
 // Read propertyData.js and convert to a plain JS assignment for inline injection
 const fs = require("fs");
@@ -40,6 +41,9 @@ module.exports = {
     ],
   },
   plugins: [
+    new webpack.DefinePlugin({
+      "process.env.GOOGLE_MAPS_API_KEY": JSON.stringify(process.env.GOOGLE_MAPS_API_KEY || ""),
+    }),
     // Main React app
     new HtmlWebpackPlugin({
       template: "./public/index.html",
