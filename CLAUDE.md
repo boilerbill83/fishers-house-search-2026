@@ -5,9 +5,11 @@
 The local git proxy resets each session and is **read-only**. Before any push, set the remote to use the PAT:
 
 ```bash
-git remote set-url origin https://<YOUR_GITHUB_PAT>@github.com/boilerbill83/fishers-house-search-2026.git
-# The PAT is stored in your password manager — ask Claude if you need it
+PAT=$(cat /home/user/fishers-house-search-2026/.github_pat)
+git remote set-url origin https://${PAT}@github.com/boilerbill83/fishers-house-search-2026.git
 ```
+
+**The PAT is stored in `/home/user/fishers-house-search-2026/.github_pat`** (gitignored). Run the two lines above at the start of every session before pushing.
 
 If push is rejected (remote ahead), rebase first:
 ```bash
