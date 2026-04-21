@@ -1,1 +1,4 @@
 .github_pat
+node_modules/
+dist/
+package-lock.json
