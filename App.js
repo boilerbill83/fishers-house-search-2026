@@ -263,7 +263,7 @@ const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) =>
         <div className="flex justify-between"><span className="text-gray-600">Pool:</span><span className="font-medium">{house.hasNeighborhoodPool ? "✓" : "✗"}</span></div>
         {house.neighborhoodSummary && (
           <div className="pt-1 border-t border-gray-100">
-            <span className="text-gray-500 text-xs font-medium uppercase tracking-wide">Area</span>
+            <span className="text-gray-500 text-xs font-medium uppercase tracking-wide">Neighborhood Description</span>
             <p className="text-xs text-gray-500 italic mt-0.5 line-clamp-3">{house.neighborhoodSummary}</p>
           </div>
         )}
