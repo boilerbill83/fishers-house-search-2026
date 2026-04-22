@@ -36,6 +36,17 @@ That's it. GitHub Actions auto-deploys to https://boilerbill83.github.io/fishers
 | `App.js` | React UI — scoring, filters, summary table, cards |
 | `.github/workflows/deploy.yml` | CI/CD: npm install → webpack build → deploy to gh-pages |
 
+## Adding a New Property
+
+When adding a new house, always check the `neighborhoodSummary` field. If it is blank (`""`):
+
+1. Search the web for the subdivision name + "Fishers IN" to find HOA details, amenities, pool info, and home count.
+2. Write a 1–2 sentence factual summary covering: confirmed amenities, pool status (Yes/No/separate membership), HOA fee context, and home count if available.
+3. Set `hasNeighborhoodPool` to match the confirmed pool status.
+4. If a property shares a neighborhood already in the file, reuse that neighborhood's `neighborhoodSummary`.
+
+Also update `commuteHusband` to match the file's realistic 8am rush-hour scale (43–57 min) based on the property's location — south Fishers ~43–46 min, central ~47–50 min, north/east ~51–57 min.
+
 ## Key Property Fields
 
 ```js
