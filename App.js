@@ -15,7 +15,8 @@ const normalize = (value, min, max, inverse = false) => {
 
 const computeBounds = (houses) => ({
   prices:   { min: Math.min(...houses.map(h => h.price)),                  max: Math.max(...houses.map(h => h.price)) },
-  commutes: { min: Math.min(...houses.map(h => h.commuteHusband)),         max: Math.max(...houses.map(h => h.commuteHusband)) },
+  commutes:      { min: Math.min(...houses.map(h => h.commuteHusband)),            max: Math.max(...houses.map(h => h.commuteHusband)) },
+  farmersMarket: { min: Math.min(...houses.map(h => h.walkToFarmersMarket || 0)), max: Math.max(...houses.map(h => h.walkToFarmersMarket || 0)) },
   beds:     { min: Math.min(...houses.map(h => h.beds)),                   max: Math.max(...houses.map(h => h.beds)) },
   baths:    { min: Math.min(...houses.map(h => h.baths)),                  max: Math.max(...houses.map(h => h.baths)) },
   sqfts:    { min: Math.min(...houses.map(h => h.sqft)),                   max: Math.max(...houses.map(h => h.sqft)) },
@@ -42,6 +43,8 @@ const calculateScore = (house, bounds, scoringWeights, scoringEnabled) => {
     addScore("price", normalize(house.price, bounds.prices.min, bounds.prices.max, true), scoringWeights.price);
   if (scoringEnabled.commuteHusband)
     addScore("commuteHusband", normalize(house.commuteHusband, bounds.commutes.min, bounds.commutes.max, true), scoringWeights.commuteHusband);
+  if (scoringEnabled.walkToFarmersMarket)
+    addScore("walkToFarmersMarket", normalize(house.walkToFarmersMarket || 0, bounds.farmersMarket.min, bounds.farmersMarket.max, true), scoringWeights.walkToFarmersMarket);
   if (scoringEnabled.beds && house.beds)
     addScore("beds", normalize(house.beds, bounds.beds.min, bounds.beds.max), scoringWeights.beds);
   if (scoringEnabled.baths && house.baths)
@@ -259,6 +262,12 @@ const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) =>
             </button>
           </span>
         </div>
+        {house.walkToFarmersMarket != null && (
+          <div className="flex justify-between">
+            <span className="text-gray-600">Farmers Market:</span>
+            <span className="font-medium">{house.walkToFarmersMarket} min walk</span>
+          </div>
+        )}
         <div className="flex justify-between"><span className="text-gray-600">Basement:</span><span className="font-medium">{house.basement || "No"}</span></div>
         <div className="flex justify-between"><span className="text-gray-600">Pool:</span><span className="font-medium">{house.hasNeighborhoodPool ? "✓" : "✗"}</span></div>
         {house.neighborhoodSummary && (
@@ -276,8 +285,8 @@ const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) =>
 
 const ScoringPreferencesModal = ({ scoringWeights, setScoringWeights, scoringEnabled, setScoringEnabled, onClose }) => {
   const labels = {
-    price: "Purchase Price", commuteHusband: "Commute to Downtown", beds: "Bedrooms",
-    baths: "Bathrooms", sqft: "Square Footage", garage: "Garage (3-car goal)",
+    price: "Purchase Price", commuteHusband: "Commute to Downtown", walkToFarmersMarket: "Walk to Farmers Market",
+    beds: "Bedrooms", baths: "Bathrooms", sqft: "Square Footage", garage: "Garage (3-car goal)",
     basement: "Finished Basement", yearBuilt: "Year Built", daysOnMarket: "Days on Market",
     walkScore: "Walk Score", bikeScore: "Bike Score", hasNeighborhoodPool: "Neighborhood Pool",
     hoaFees: "HOA Fees", lotSize: "Lot Size", pricePerSqft: "Price/Sqft",
@@ -352,7 +361,7 @@ const HouseTrackerApp = () => {
   const [scoringWeights, setScoringWeights] = useState(() => {
     const saved = localStorage.getItem("scoringWeights");
     return saved ? JSON.parse(saved) : {
-      price: 5, commuteHusband: 7, beds: 7, baths: 3, sqft: 8,
+      price: 5, commuteHusband: 7, walkToFarmersMarket: 8, beds: 7, baths: 3, sqft: 8,
       garage: 7, basement: 8, yearBuilt: 0, daysOnMarket: 2,
       walkScore: 6, bikeScore: 1, hasNeighborhoodPool: 7,
       hoaFees: 1, lotSize: 6, pricePerSqft: 7,
@@ -362,7 +371,7 @@ const HouseTrackerApp = () => {
   const [scoringEnabled, setScoringEnabled] = useState(() => {
     const saved = localStorage.getItem("scoringEnabled");
     return saved ? JSON.parse(saved) : {
-      price: false, commuteHusband: true, beds: true, baths: true,
+      price: false, commuteHusband: true, walkToFarmersMarket: true, beds: true, baths: true,
       sqft: true, garage: true, basement: true, yearBuilt: true,
       daysOnMarket: true, walkScore: true, bikeScore: true,
       hasNeighborhoodPool: true, hoaFees: false, lotSize: true, pricePerSqft: true,
