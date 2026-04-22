@@ -132,7 +132,7 @@ const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) =>
   };
 
   const getBorderColor = () => {
-    if (house.favorite === true) return "border-pink-500";
+    if (house.favorite === true && house.status === "Active") return "border-pink-500";
     if (house.status === "Pending" || house.status === "Sold") return "border-gray-300";
     const activeScores = houses
       .filter(h => h.status === "Active")
@@ -169,7 +169,7 @@ const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) =>
   const statusBadge = getStatusBadge();
 
   return (
-    <div className={`bg-white rounded-lg shadow-md p-3 border-2 ${getBorderColor()} hover:shadow-lg hover:scale-[1.02] transition-all duration-200 ${isDimmed ? "opacity-60" : ""} ${house.favorite === true ? "ring-2 ring-pink-300 ring-offset-1" : ""}`}>
+    <div className={`bg-white rounded-lg shadow-md p-3 border-2 ${getBorderColor()} hover:shadow-lg hover:scale-[1.02] transition-all duration-200 ${isDimmed ? "opacity-60" : ""} ${house.favorite === true && house.status === "Active" ? "ring-2 ring-pink-300 ring-offset-1" : ""}`}>
       {house.imageUrl ? (
         <div className="mb-3 rounded overflow-hidden bg-gray-100 relative group">
           <img src={house.imageUrl} alt={house.address}
@@ -182,7 +182,7 @@ const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) =>
               </div>
             </div>
           )}
-          {house.favorite === true && (
+          {house.favorite === true && house.status === "Active" && (
             <div className="absolute top-2 right-2 p-1.5 rounded-full bg-white bg-opacity-90 shadow-md z-10">
               <Heart size={18} className="fill-red-500 text-red-500" />
             </div>
@@ -191,7 +191,7 @@ const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) =>
       ) : (
         <div className="mb-3 rounded bg-gray-100 h-40 flex items-center justify-center relative">
           <div className="text-gray-500 text-sm">No Image</div>
-          {house.favorite === true && (
+          {house.favorite === true && house.status === "Active" && (
             <div className="absolute top-2 right-2 p-1.5 rounded-full bg-white shadow-md z-10">
               <Heart size={18} className="fill-red-500 text-red-500" />
             </div>
@@ -331,13 +331,13 @@ const HouseTrackerApp = () => {
   const [showFinancials, setShowFinancials]                 = useState(false);
   const [showSummaryTable, setShowSummaryTable]             = useState(false);
   const [selectedHouseId, setSelectedHouseId]               = useState(
-    () => ALL_PROPERTIES.find(h => h.favorite === true)?.id || ""
+    () => ALL_PROPERTIES.find(h => h.favorite === true && h.status === "Active")?.id || ""
   );
 
   const [financials, setFinancials] = useState(() => {
     const saved = localStorage.getItem("houseHuntFinancials");
     if (saved) return JSON.parse(saved);
-    const fav = ALL_PROPERTIES.find(h => h.favorite === true);
+    const fav = ALL_PROPERTIES.find(h => h.favorite === true && h.status === "Active");
     return {
       homePrice:      fav ? fav.price : 650000,
       houseSellPrice: 405000,
@@ -385,13 +385,13 @@ const HouseTrackerApp = () => {
     pending:   houses.filter(h => h.status === "Pending").length,
     sold:      houses.filter(h => h.status === "Sold").length,
     total:     houses.length,
-    favorites: houses.filter(h => h.favorite === true).length,
+    favorites: houses.filter(h => h.favorite === true && h.status === "Active").length,
   }), [houses]);
 
   const sortedHouses = useMemo(() => {
     let filtered = [...houses];
     if (statusFilter === "active")    filtered = filtered.filter(h => h.status === "Active");
-    if (statusFilter === "favorites") filtered = filtered.filter(h => h.favorite === true);
+    if (statusFilter === "favorites") filtered = filtered.filter(h => h.favorite === true && h.status === "Active");
     filtered.sort((a, b) => {
       const statusOrder = { Active: 0, Pending: 1, Sold: 2 };
       const tierDiff = (statusOrder[a.status] || 0) - (statusOrder[b.status] || 0);
