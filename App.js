@@ -359,23 +359,25 @@ const HouseTrackerApp = () => {
   });
 
   const [scoringWeights, setScoringWeights] = useState(() => {
-    const saved = localStorage.getItem("scoringWeights");
-    return saved ? JSON.parse(saved) : {
+    const defaults = {
       price: 5, commuteHusband: 7, walkToFarmersMarket: 8, beds: 7, baths: 3, sqft: 8,
       garage: 7, basement: 8, yearBuilt: 0, daysOnMarket: 2,
       walkScore: 6, bikeScore: 1, hasNeighborhoodPool: 7,
       hoaFees: 1, lotSize: 6, pricePerSqft: 7,
     };
+    const saved = localStorage.getItem("scoringWeights");
+    return saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
   });
 
   const [scoringEnabled, setScoringEnabled] = useState(() => {
-    const saved = localStorage.getItem("scoringEnabled");
-    return saved ? JSON.parse(saved) : {
+    const defaults = {
       price: false, commuteHusband: true, walkToFarmersMarket: true, beds: true, baths: true,
       sqft: true, garage: true, basement: true, yearBuilt: true,
       daysOnMarket: true, walkScore: true, bikeScore: true,
       hasNeighborhoodPool: true, hoaFees: false, lotSize: true, pricePerSqft: true,
     };
+    const saved = localStorage.getItem("scoringEnabled");
+    return saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
   });
 
   const [statusFilter, setStatusFilter]               = useState("all");
