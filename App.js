@@ -23,7 +23,8 @@ const computeBounds = (houses) => ({
   years:    { min: Math.min(...houses.map(h => h.yearBuilt)),              max: Math.max(...houses.map(h => h.yearBuilt)) },
   hoas:     { min: Math.min(...houses.map(h => (h.hoaAnnual || 0) / 12)), max: Math.max(...houses.map(h => (h.hoaAnnual || 0) / 12)) },
   lots:     { min: Math.min(...houses.map(h => h.lotSize)),                max: Math.max(...houses.map(h => h.lotSize)) },
-  ppsqfts:  { min: Math.min(...houses.map(h => h.pricePerSqft)),           max: Math.max(...houses.map(h => h.pricePerSqft)) },
+  ppsqfts:       { min: Math.min(...houses.map(h => h.pricePerSqft)),                  max: Math.max(...houses.map(h => h.pricePerSqft)) },
+  homeCounts:    { min: Math.min(...houses.map(h => h.neighborhoodHomeCount || 0)),    max: Math.max(...houses.map(h => h.neighborhoodHomeCount || 0)) },
 });
 
 // ── SCORING ───────────────────────────────────────────────────────────────────
@@ -69,6 +70,8 @@ const calculateScore = (house, bounds, scoringWeights, scoringEnabled) => {
     addScore("lotSize", normalize(house.lotSize, bounds.lots.min, bounds.lots.max), scoringWeights.lotSize);
   if (scoringEnabled.pricePerSqft)
     addScore("pricePerSqft", normalize(house.pricePerSqft, bounds.ppsqfts.min, bounds.ppsqfts.max, true), scoringWeights.pricePerSqft);
+  if (scoringEnabled.neighborhoodHomeCount)
+    addScore("neighborhoodHomeCount", normalize(house.neighborhoodHomeCount || 0, bounds.homeCounts.min, bounds.homeCounts.max), scoringWeights.neighborhoodHomeCount);
   if (scoringEnabled.daysOnMarket) {
     const daysMatch = house.daysOnMarket.match(/(\d+)/);
     const days = daysMatch ? parseInt(daysMatch[1]) : 0;
@@ -91,6 +94,9 @@ const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) =>
   const [liveCommute, setLiveCommute] = useState(null);
   const [commuteLoading, setCommuteLoading] = useState(false);
   const [commuteError, setCommuteError] = useState(false);
+  const [nearbyHomes, setNearbyHomes] = useState(null);
+  const [nearbyLoading, setNearbyLoading] = useState(false);
+  const [nearbyError, setNearbyError] = useState(false);
 
   const fetchLiveCommute = async () => {
     setCommuteLoading(true);
@@ -131,6 +137,25 @@ const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) =>
       setCommuteError(true);
     } finally {
       setCommuteLoading(false);
+    }
+  };
+
+  const fetchNearbyHomes = async () => {
+    setNearbyLoading(true);
+    setNearbyError(false);
+    try {
+      const query = `[out:json][timeout:30];(way["building"~"^(house|residential|detached|semidetached_house|terrace|yes)$"](around:804,${house.latitude},${house.longitude}););out count;`;
+      const resp = await fetch("https://overpass-api.de/api/interpreter", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `data=${encodeURIComponent(query)}`,
+      });
+      const data = await resp.json();
+      setNearbyHomes(parseInt(data.elements[0].tags.total));
+    } catch {
+      setNearbyError(true);
+    } finally {
+      setNearbyLoading(false);
     }
   };
 
@@ -268,6 +293,24 @@ const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) =>
             <span className="font-medium">{house.walkToFarmersMarket} min walk</span>
           </div>
         )}
+        <div className="flex justify-between items-center">
+          <span className="text-gray-600">Nearby homes:</span>
+          <span className="flex items-center gap-1.5 font-medium">
+            {nearbyHomes != null ? (
+              <span className="text-green-700">{nearbyHomes} <span className="text-xs font-normal text-green-500">(½ mi GPS)</span></span>
+            ) : (
+              <span className="text-gray-500">{house.neighborhoodHomeCount ?? "—"} <span className="text-xs font-normal text-gray-400">(est.)</span></span>
+            )}
+            <button
+              onClick={fetchNearbyHomes}
+              disabled={nearbyLoading}
+              title="Count residential buildings within 0.5 miles via OpenStreetMap"
+              className="text-xs px-1.5 py-0.5 rounded bg-green-50 hover:bg-green-100 text-green-600 hover:text-green-800 disabled:opacity-40 transition-colors"
+            >
+              {nearbyLoading ? "…" : nearbyHomes != null ? "↻" : nearbyError ? "err" : "GPS"}
+            </button>
+          </span>
+        </div>
         <div className="flex justify-between"><span className="text-gray-600">Basement:</span><span className="font-medium">{house.basement || "No"}</span></div>
         <div className="flex justify-between"><span className="text-gray-600">Pool:</span><span className="font-medium">{house.hasNeighborhoodPool ? "✓" : "✗"}</span></div>
         {house.neighborhoodSummary && (
@@ -290,6 +333,7 @@ const ScoringPreferencesModal = ({ scoringWeights, setScoringWeights, scoringEna
     basement: "Finished Basement", yearBuilt: "Year Built", daysOnMarket: "Days on Market",
     walkScore: "Walk Score", bikeScore: "Bike Score", hasNeighborhoodPool: "Neighborhood Pool",
     hoaFees: "HOA Fees", lotSize: "Lot Size", pricePerSqft: "Price/Sqft",
+    neighborhoodHomeCount: "Neighborhood Size (# homes)",
   };
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -363,7 +407,7 @@ const HouseTrackerApp = () => {
       price: 5, commuteHusband: 7, walkToFarmersMarket: 8, beds: 7, baths: 3, sqft: 8,
       garage: 7, basement: 8, yearBuilt: 0, daysOnMarket: 2,
       walkScore: 6, bikeScore: 1, hasNeighborhoodPool: 7,
-      hoaFees: 1, lotSize: 6, pricePerSqft: 7,
+      hoaFees: 1, lotSize: 6, pricePerSqft: 7, neighborhoodHomeCount: 6,
     };
     const saved = localStorage.getItem("scoringWeights");
     return saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
@@ -375,6 +419,7 @@ const HouseTrackerApp = () => {
       sqft: true, garage: true, basement: true, yearBuilt: true,
       daysOnMarket: true, walkScore: true, bikeScore: true,
       hasNeighborhoodPool: true, hoaFees: false, lotSize: true, pricePerSqft: true,
+      neighborhoodHomeCount: true,
     };
     const saved = localStorage.getItem("scoringEnabled");
     return saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
