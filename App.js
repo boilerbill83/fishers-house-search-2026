@@ -40,8 +40,6 @@ const calculateScore = (house, bounds, scoringWeights, scoringEnabled) => {
     }
   };
 
-  if (scoringEnabled.price)
-    addScore("price", normalize(house.price, bounds.prices.min, bounds.prices.max, true), scoringWeights.price);
   if (scoringEnabled.commuteHusband)
     addScore("commuteHusband", normalize(house.commuteHusband, bounds.commutes.min, bounds.commutes.max, true), scoringWeights.commuteHusband);
   if (scoringEnabled.walkToFarmersMarket)
@@ -56,27 +54,18 @@ const calculateScore = (house, bounds, scoringWeights, scoringEnabled) => {
     addScore("garage", (house.garage / 3) * 100, scoringWeights.garage);
   if (scoringEnabled.basement)
     addScore("basement", house.basement === "Finished" ? 100 : house.basement === "Unfinished" ? 50 : 0, scoringWeights.basement);
-  if (scoringEnabled.yearBuilt)
-    addScore("yearBuilt", normalize(house.yearBuilt, bounds.years.min, bounds.years.max), scoringWeights.yearBuilt);
   if (scoringEnabled.walkScore)
     addScore("walkScore", house.walkScore, scoringWeights.walkScore);
   if (scoringEnabled.bikeScore)
     addScore("bikeScore", house.bikeScore || 0, scoringWeights.bikeScore);
   if (scoringEnabled.hasNeighborhoodPool)
     addScore("hasNeighborhoodPool", house.hasNeighborhoodPool ? 100 : 0, scoringWeights.hasNeighborhoodPool);
-  if (scoringEnabled.hoaFees)
-    addScore("hoaFees", normalize((house.hoaAnnual || 0) / 12, bounds.hoas.min, bounds.hoas.max, true), scoringWeights.hoaFees);
   if (scoringEnabled.lotSize)
     addScore("lotSize", normalize(house.lotSize, bounds.lots.min, bounds.lots.max), scoringWeights.lotSize);
   if (scoringEnabled.pricePerSqft)
     addScore("pricePerSqft", normalize(house.pricePerSqft, bounds.ppsqfts.min, bounds.ppsqfts.max, true), scoringWeights.pricePerSqft);
   if (scoringEnabled.neighborhoodHomeCount)
     addScore("neighborhoodHomeCount", normalize(house.neighborhoodHomeCount || 0, bounds.homeCounts.min, bounds.homeCounts.max), scoringWeights.neighborhoodHomeCount);
-  if (scoringEnabled.daysOnMarket) {
-    const daysMatch = house.daysOnMarket.match(/(\d+)/);
-    const days = daysMatch ? parseInt(daysMatch[1]) : 0;
-    addScore("daysOnMarket", Math.max(100 - (days / 180) * 100, 0), scoringWeights.daysOnMarket);
-  }
 
   return { rawScore: maxPossibleScore === 0 ? 0 : (totalScore / maxPossibleScore) * 100 };
 };
@@ -328,11 +317,10 @@ const HouseCard = ({ house, houses, bounds, scoringWeights, scoringEnabled }) =>
 
 const ScoringPreferencesModal = ({ scoringWeights, setScoringWeights, scoringEnabled, setScoringEnabled, onClose }) => {
   const labels = {
-    price: "Purchase Price", commuteHusband: "Commute to Downtown", walkToFarmersMarket: "Walk to Farmers Market",
+    commuteHusband: "Commute to Downtown", walkToFarmersMarket: "Walk to Farmers Market",
     beds: "Bedrooms", baths: "Bathrooms", sqft: "Square Footage", garage: "Garage (3-car goal)",
-    basement: "Finished Basement", yearBuilt: "Year Built", daysOnMarket: "Days on Market",
-    walkScore: "Walk Score", bikeScore: "Bike Score", hasNeighborhoodPool: "Neighborhood Pool",
-    hoaFees: "HOA Fees", lotSize: "Lot Size", pricePerSqft: "Price/Sqft",
+    basement: "Finished Basement", walkScore: "Walk Score", bikeScore: "Bike Score",
+    hasNeighborhoodPool: "Neighborhood Pool", lotSize: "Lot Size", pricePerSqft: "Price/Sqft",
     neighborhoodHomeCount: "Neighborhood Size (# homes)",
   };
   return (
@@ -404,10 +392,9 @@ const HouseTrackerApp = () => {
 
   const [scoringWeights, setScoringWeights] = useState(() => {
     const defaults = {
-      price: 5, commuteHusband: 7, walkToFarmersMarket: 8, beds: 7, baths: 3, sqft: 8,
-      garage: 7, basement: 8, yearBuilt: 0, daysOnMarket: 2,
-      walkScore: 6, bikeScore: 1, hasNeighborhoodPool: 7,
-      hoaFees: 1, lotSize: 6, pricePerSqft: 7, neighborhoodHomeCount: 6,
+      commuteHusband: 7, walkToFarmersMarket: 6, beds: 7, baths: 3, sqft: 8,
+      garage: 7, basement: 8, walkScore: 6, bikeScore: 1,
+      hasNeighborhoodPool: 7, lotSize: 6, pricePerSqft: 7, neighborhoodHomeCount: 4,
     };
     const saved = localStorage.getItem("scoringWeights");
     return saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
@@ -415,10 +402,9 @@ const HouseTrackerApp = () => {
 
   const [scoringEnabled, setScoringEnabled] = useState(() => {
     const defaults = {
-      price: false, commuteHusband: true, walkToFarmersMarket: true, beds: true, baths: true,
-      sqft: true, garage: true, basement: true, yearBuilt: true,
-      daysOnMarket: true, walkScore: true, bikeScore: true,
-      hasNeighborhoodPool: true, hoaFees: false, lotSize: true, pricePerSqft: true,
+      commuteHusband: true, walkToFarmersMarket: true, beds: true, baths: true,
+      sqft: true, garage: true, basement: true, walkScore: true, bikeScore: true,
+      hasNeighborhoodPool: true, lotSize: true, pricePerSqft: true,
       neighborhoodHomeCount: true,
     };
     const saved = localStorage.getItem("scoringEnabled");
