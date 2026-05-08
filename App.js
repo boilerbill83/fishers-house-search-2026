@@ -435,6 +435,8 @@ const HouseTrackerApp = () => {
     if (statusFilter === "active")    filtered = filtered.filter(h => h.status === "Active");
     if (statusFilter === "favorites") filtered = filtered.filter(h => h.favorite === true && h.status === "Active");
     filtered.sort((a, b) => {
+      if (a.favorite && !b.favorite) return -1;
+      if (!a.favorite && b.favorite) return 1;
       const statusOrder = { Active: 0, Pending: 1, Sold: 2 };
       const tierDiff = (statusOrder[a.status] || 0) - (statusOrder[b.status] || 0);
       if (tierDiff !== 0) return tierDiff;
