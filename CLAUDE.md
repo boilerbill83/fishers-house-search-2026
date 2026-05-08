@@ -1,15 +1,35 @@
 # Claude Code Session Guide
 
-## Git / Push Setup (CRITICAL — do this first every session)
+## Session Start Checklist (do this before anything else)
 
-The local git proxy resets each session and is **read-only**. Before any push, set the remote to use the PAT:
+Run these two checks immediately at the start of every session — don't wait until push time:
+
+**1. Check for PAT:**
+```bash
+cat /home/user/fishers-house-search-2026/.github_pat
+```
+- If the file **exists**: set the remote now → `PAT=$(cat /home/user/fishers-house-search-2026/.github_pat) && git remote set-url origin https://${PAT}@github.com/boilerbill83/fishers-house-search-2026.git`
+- If the file **does not exist**: **stop and ask the user for their GitHub PAT immediately**, before making any changes. Do not proceed without it — there is no other push path. Once received, save it: `echo "ghp_..." > /home/user/fishers-house-search-2026/.github_pat`
+
+> **Why:** The `.github_pat` file is gitignored and does not persist across sessions. The local git proxy is read-only. The `mcp__github__push_files` tool returns 403 for this repo — do not attempt it.
+
+**2. Check for unpushed commits from a prior session:**
+```bash
+git log origin/main..HEAD --oneline
+```
+If any commits appear, push them to main before starting new work (see push instructions below).
+
+## Git / Push Setup
+
+After setting the remote URL (step 1 above), always push to **both** the session feature branch and `main`:
 
 ```bash
-PAT=$(cat /home/user/fishers-house-search-2026/.github_pat)
-git remote set-url origin https://${PAT}@github.com/boilerbill83/fishers-house-search-2026.git
-```
+# Push to feature branch (required by session instructions)
+git push -u origin <current-branch>
 
-**The PAT is stored in `/home/user/fishers-house-search-2026/.github_pat`** (gitignored). Run the two lines above at the start of every session before pushing.
+# Push to main (required for GitHub Actions deploy)
+git push origin <current-branch>:main
+```
 
 If push is rejected (remote ahead), rebase first:
 ```bash
