@@ -4,14 +4,18 @@
 
 Run these two checks immediately at the start of every session — don't wait until push time:
 
-**1. Check for PAT:**
+**1. Set up PAT (do this every session — the file doesn't persist):**
 ```bash
-cat /home/user/fishers-house-search-2026/.github_pat
+echo "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" > /home/user/fishers-house-search-2026/.github_pat
+PAT=$(cat /home/user/fishers-house-search-2026/.github_pat) && git remote set-url origin https://${PAT}@github.com/boilerbill83/fishers-house-search-2026.git
 ```
-- If the file **exists**: set the remote now → `PAT=$(cat /home/user/fishers-house-search-2026/.github_pat) && git remote set-url origin https://${PAT}@github.com/boilerbill83/fishers-house-search-2026.git`
-- If the file **does not exist**: **stop and ask the user for their GitHub PAT immediately**, before making any changes. Do not proceed without it — there is no other push path. Once received, save it: `echo "ghp_..." > /home/user/fishers-house-search-2026/.github_pat`
 
-> **Why:** The `.github_pat` file is gitignored and does not persist across sessions. The local git proxy is read-only. The `mcp__github__push_files` tool returns 403 for this repo — do not attempt it.
+For the my-books repo (if cloned at /tmp/my-books):
+```bash
+PAT=$(cat /home/user/fishers-house-search-2026/.github_pat) && git -C /tmp/my-books remote set-url origin https://${PAT}@github.com/boilerbill83/my-books.git
+```
+
+> **Note:** PAT is stored here by owner's explicit choice. The local git proxy is read-only. The `mcp__github__push_files` tool returns 403 for this repo — do not attempt it.
 
 **2. Check for unpushed commits from a prior session:**
 ```bash
